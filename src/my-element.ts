@@ -18,6 +18,9 @@ import './components/checkbox.ts'
 import './components/slider.ts'
 import './components/drawer.ts'
 import './components/pagination.ts'
+import './components/sidebar.ts'
+import './components/upload.ts'
+import './components/transfer.ts'
 
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
@@ -40,6 +43,18 @@ export class ShowcaseApp extends LitElement {
   @state() private drawerWeeklyDigest = false
   @state() private drawerAutoUpdate = true
   @state() private sidebarOpen = false
+  @state() private sidebarDemoOpen = false
+  @state() private transferSource = [
+    { id: 'js', label: 'JavaScript' },
+    { id: 'ts', label: 'TypeScript' },
+    { id: 'py', label: 'Python' },
+    { id: 'rs', label: 'Rust' },
+    { id: 'go', label: 'Go' },
+    { id: 'rb', label: 'Ruby' },
+    { id: 'java', label: 'Java' },
+    { id: 'kt', label: 'Kotlin' },
+  ]
+  @state() private transferTarget: { id: string; label: string }[] = []
   @state() private signupName = ''
   @state() private signupEmail = ''
   @state() private signupPassword = ''
@@ -56,6 +71,7 @@ export class ShowcaseApp extends LitElement {
         { id: 'checkbox', label: 'Checkbox', desc: 'Checkbox with label and disabled state support' },
         { id: 'toggle', label: 'Toggle', desc: 'Binary on/off switch for boolean settings' },
         { id: 'slider', label: 'Slider', desc: 'Range input with configurable min, max, and step' },
+        { id: 'upload', label: 'Upload', desc: 'File upload with drag-drop, preview, and removal' },
       ],
     },
     {
@@ -74,6 +90,7 @@ export class ShowcaseApp extends LitElement {
         { id: 'accordion', label: 'Accordion', desc: 'Collapsible content sections with animation' },
         { id: 'pagination', label: 'Pagination', desc: 'Page controls with total count awareness' },
         { id: 'dropdown', label: 'Dropdown', desc: 'Floating menu anchored to a trigger button' },
+        { id: 'sidebar', label: 'Sidebar', desc: 'Left-sliding panel with icon-driven navigation items' },
       ],
     },
     {
@@ -88,6 +105,7 @@ export class ShowcaseApp extends LitElement {
       items: [
         { id: 'data-table', label: 'Data Table', desc: 'Tabular data display with built-in pagination' },
         { id: 'calendar', label: 'Calendar', desc: 'Date picker with month and year dropdown navigation' },
+        { id: 'transfer', label: 'Transfer', desc: 'Dual-column list for moving items between source and target' },
       ],
     },
   ]
@@ -610,6 +628,60 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
+  private renderSidebarDemo() {
+    return html`
+      ${this.tile('Interactive Demo', html`
+        <showcase-button @click=${() => this.sidebarDemoOpen = true}>Open Sidebar</showcase-button>
+        <showcase-sidebar
+          ?open=${this.sidebarDemoOpen}
+          title="Navigation"
+          @close=${() => this.sidebarDemoOpen = false}
+        >
+          <showcase-sidebar-item label="Dashboard" .active=${true} .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>`}></showcase-sidebar-item>
+          <showcase-sidebar-item label="Inbox" badge="12" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>`}></showcase-sidebar-item>
+          <showcase-sidebar-item label="Analytics" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`}></showcase-sidebar-item>
+          <showcase-sidebar-item label="Settings" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`}></showcase-sidebar-item>
+          <div style="height:8px"></div>
+          <showcase-sidebar-item label="Help & Support" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`}></showcase-sidebar-item>
+        </showcase-sidebar>
+      `)}
+    `
+  }
+
+  private renderUploadDemo() {
+    return html`
+      ${this.tile('Single Upload', html`
+        <showcase-upload
+          label="Upload an image"
+          hint="PNG, JPG or WebP"
+          accept="image/*"
+        ></showcase-upload>
+      `)}
+      ${this.tile('Multiple Upload', html`
+        <showcase-upload
+          label="Upload files"
+          hint="Drag & drop or click to browse"
+          ?multiple=${true}
+        ></showcase-upload>
+      `)}
+    `
+  }
+
+  private renderTransferDemo() {
+    return html`
+      ${this.tile('Interactive Demo', html`
+        <showcase-transfer
+          .source=${this.transferSource}
+          .target=${this.transferTarget}
+          @transfer-change=${(e: CustomEvent) => {
+            this.transferSource = e.detail.source
+            this.transferTarget = e.detail.target
+          }}
+        ></showcase-transfer>
+      `)}
+    `
+  }
+
   private renderContent() {
     switch (this.activeTab) {
       case 'button': return this.renderButtonDemo()
@@ -629,6 +701,9 @@ export class ShowcaseApp extends LitElement {
       case 'slider': return this.renderSliderDemo()
       case 'drawer': return this.renderDrawerDemo()
       case 'pagination': return this.renderPaginationDemo()
+      case 'sidebar': return this.renderSidebarDemo()
+      case 'upload': return this.renderUploadDemo()
+      case 'transfer': return this.renderTransferDemo()
       default: return this.renderButtonDemo()
     }
   }
@@ -844,12 +919,56 @@ export class ShowcaseApp extends LitElement {
       --slider-value: #6366f1;
       --slider-track: #e5e7eb;
       --slider-thumb: #6366f1;
+      --upload-border: #d1d5db;
+      --upload-bg: #fafafa;
+      --upload-accent: #6366f1;
+      --upload-active-bg: #eef2ff;
+      --upload-border-has: #e5e7eb;
+      --upload-bg-has: #ffffff;
+      --upload-label-color: #374151;
+      --upload-hint-color: #9ca3af;
+      --upload-file-bg: #f9fafb;
+      --upload-file-border: #e5e7eb;
+      --upload-file-name: #1f2937;
+      --upload-file-meta: #9ca3af;
+      --upload-remove: #9ca3af;
+      --upload-remove-hover: #ef4444;
+      --upload-remove-bg: #fef2f2;
+      --xfer-border: #e5e7eb;
+      --xfer-header-bg: #f9fafb;
+      --xfer-header-text: #374151;
+      --xfer-meta: #9ca3af;
+      --xfer-count-bg: #f3f4f6;
+      --xfer-item-text: #1f2937;
+      --xfer-item-hover: #f9fafb;
+      --xfer-item-selected-bg: #eef2ff;
+      --xfer-check-border: #d1d5db;
+      --xfer-accent: #6366f1;
+      --xfer-btn-border: #d1d5db;
+      --xfer-btn-bg: #ffffff;
+      --xfer-btn-text: #6b7280;
+      --xfer-btn-hover: #eef2ff;
       --drawer-bg: #ffffff;
       --drawer-border: #e5e7eb;
       --drawer-title: #1e293b;
       --drawer-close: #64748b;
       --drawer-close-hover: #f1f5f9;
       --drawer-body: #475569;
+      --sidebar-bg: #ffffff;
+      --sidebar-shadow: 4px 0 24px rgba(0,0,0,0.15);
+      --sidebar-title: #1e293b;
+      --sidebar-close: #64748b;
+      --sidebar-close-hover: #f1f5f9;
+      --sidebar-divider: #e5e7eb;
+      --sidebar-item-text: #475569;
+      --sidebar-item-hover: #f1f5f9;
+      --sidebar-item-hover-text: #1e293b;
+      --sidebar-item-active-bg: #eef2ff;
+      --sidebar-item-active-text: #6366f1;
+      --sidebar-badge-bg: #e5e7eb;
+      --sidebar-badge-text: #4b5563;
+      --sidebar-badge-active-bg: #c7d2fe;
+      --sidebar-badge-active-text: #4338ca;
 
       background: var(--bg);
       color: var(--text-1);
@@ -989,12 +1108,56 @@ export class ShowcaseApp extends LitElement {
       --slider-value: #818cf8;
       --slider-track: #3f3f46;
       --slider-thumb: #818cf8;
+      --upload-border: #3f3f46;
+      --upload-bg: #141414;
+      --upload-accent: #818cf8;
+      --upload-active-bg: #1e1b4b;
+      --upload-border-has: #27272a;
+      --upload-bg-has: #1c1c1c;
+      --upload-label-color: #d4d4d8;
+      --upload-hint-color: #52525b;
+      --upload-file-bg: #141414;
+      --upload-file-border: #27272a;
+      --upload-file-name: #e4e4e7;
+      --upload-file-meta: #52525b;
+      --upload-remove: #52525b;
+      --upload-remove-hover: #f87171;
+      --upload-remove-bg: #450a0a;
+      --xfer-border: #27272a;
+      --xfer-header-bg: #141414;
+      --xfer-header-text: #d4d4d8;
+      --xfer-meta: #52525b;
+      --xfer-count-bg: #1c1c1c;
+      --xfer-item-text: #e4e4e7;
+      --xfer-item-hover: #141414;
+      --xfer-item-selected-bg: #1e1b4b;
+      --xfer-check-border: #3f3f46;
+      --xfer-accent: #818cf8;
+      --xfer-btn-border: #3f3f46;
+      --xfer-btn-bg: #1c1c1c;
+      --xfer-btn-text: #a1a1aa;
+      --xfer-btn-hover: #1e1b4b;
       --drawer-bg: #141414;
       --drawer-border: #27272a;
       --drawer-title: #fafafa;
       --drawer-close: #a1a1aa;
       --drawer-close-hover: #27272a;
       --drawer-body: #a1a1aa;
+      --sidebar-bg: #141414;
+      --sidebar-shadow: 4px 0 24px rgba(0,0,0,0.4);
+      --sidebar-title: #fafafa;
+      --sidebar-close: #a1a1aa;
+      --sidebar-close-hover: #27272a;
+      --sidebar-divider: #27272a;
+      --sidebar-item-text: #a1a1aa;
+      --sidebar-item-hover: #1c1c1c;
+      --sidebar-item-hover-text: #fafafa;
+      --sidebar-item-active-bg: #1e1b4b;
+      --sidebar-item-active-text: #818cf8;
+      --sidebar-badge-bg: #27272a;
+      --sidebar-badge-text: #a1a1aa;
+      --sidebar-badge-active-bg: #3730a3;
+      --sidebar-badge-active-text: #c7d2fe;
     }
 
     /* ── Shell ── */
