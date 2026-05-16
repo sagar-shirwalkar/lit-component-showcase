@@ -19,6 +19,7 @@ import './components/slider.ts'
 import './components/drawer.ts'
 import './components/pagination.ts'
 import './components/sidebar.ts'
+import './components/upload.ts'
 
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
@@ -58,6 +59,7 @@ export class ShowcaseApp extends LitElement {
         { id: 'checkbox', label: 'Checkbox', desc: 'Checkbox with label and disabled state support' },
         { id: 'toggle', label: 'Toggle', desc: 'Binary on/off switch for boolean settings' },
         { id: 'slider', label: 'Slider', desc: 'Range input with configurable min, max, and step' },
+        { id: 'upload', label: 'Upload', desc: 'File upload with drag-drop, preview, and removal' },
       ],
     },
     {
@@ -633,6 +635,25 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
+  private renderUploadDemo() {
+    return html`
+      ${this.tile('Single Upload', html`
+        <showcase-upload
+          label="Upload an image"
+          hint="PNG, JPG or WebP"
+          accept="image/*"
+        ></showcase-upload>
+      `)}
+      ${this.tile('Multiple Upload', html`
+        <showcase-upload
+          label="Upload files"
+          hint="Drag & drop or click to browse"
+          ?multiple=${true}
+        ></showcase-upload>
+      `)}
+    `
+  }
+
   private renderContent() {
     switch (this.activeTab) {
       case 'button': return this.renderButtonDemo()
@@ -653,6 +674,7 @@ export class ShowcaseApp extends LitElement {
       case 'drawer': return this.renderDrawerDemo()
       case 'pagination': return this.renderPaginationDemo()
       case 'sidebar': return this.renderSidebarDemo()
+      case 'upload': return this.renderUploadDemo()
       default: return this.renderButtonDemo()
     }
   }
@@ -868,6 +890,21 @@ export class ShowcaseApp extends LitElement {
       --slider-value: #6366f1;
       --slider-track: #e5e7eb;
       --slider-thumb: #6366f1;
+      --upload-border: #d1d5db;
+      --upload-bg: #fafafa;
+      --upload-accent: #6366f1;
+      --upload-active-bg: #eef2ff;
+      --upload-border-has: #e5e7eb;
+      --upload-bg-has: #ffffff;
+      --upload-label-color: #374151;
+      --upload-hint-color: #9ca3af;
+      --upload-file-bg: #f9fafb;
+      --upload-file-border: #e5e7eb;
+      --upload-file-name: #1f2937;
+      --upload-file-meta: #9ca3af;
+      --upload-remove: #9ca3af;
+      --upload-remove-hover: #ef4444;
+      --upload-remove-bg: #fef2f2;
       --drawer-bg: #ffffff;
       --drawer-border: #e5e7eb;
       --drawer-title: #1e293b;
@@ -1028,6 +1065,21 @@ export class ShowcaseApp extends LitElement {
       --slider-value: #818cf8;
       --slider-track: #3f3f46;
       --slider-thumb: #818cf8;
+      --upload-border: #3f3f46;
+      --upload-bg: #141414;
+      --upload-accent: #818cf8;
+      --upload-active-bg: #1e1b4b;
+      --upload-border-has: #27272a;
+      --upload-bg-has: #1c1c1c;
+      --upload-label-color: #d4d4d8;
+      --upload-hint-color: #52525b;
+      --upload-file-bg: #141414;
+      --upload-file-border: #27272a;
+      --upload-file-name: #e4e4e7;
+      --upload-file-meta: #52525b;
+      --upload-remove: #52525b;
+      --upload-remove-hover: #f87171;
+      --upload-remove-bg: #450a0a;
       --drawer-bg: #141414;
       --drawer-border: #27272a;
       --drawer-title: #fafafa;
