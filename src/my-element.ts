@@ -20,6 +20,7 @@ import './components/drawer.ts'
 import './components/pagination.ts'
 import './components/sidebar.ts'
 import './components/upload.ts'
+import './components/transfer.ts'
 
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
@@ -43,6 +44,17 @@ export class ShowcaseApp extends LitElement {
   @state() private drawerAutoUpdate = true
   @state() private sidebarOpen = false
   @state() private sidebarDemoOpen = false
+  @state() private transferSource = [
+    { id: 'js', label: 'JavaScript' },
+    { id: 'ts', label: 'TypeScript' },
+    { id: 'py', label: 'Python' },
+    { id: 'rs', label: 'Rust' },
+    { id: 'go', label: 'Go' },
+    { id: 'rb', label: 'Ruby' },
+    { id: 'java', label: 'Java' },
+    { id: 'kt', label: 'Kotlin' },
+  ]
+  @state() private transferTarget: { id: string; label: string }[] = []
   @state() private signupName = ''
   @state() private signupEmail = ''
   @state() private signupPassword = ''
@@ -93,6 +105,7 @@ export class ShowcaseApp extends LitElement {
       items: [
         { id: 'data-table', label: 'Data Table', desc: 'Tabular data display with built-in pagination' },
         { id: 'calendar', label: 'Calendar', desc: 'Date picker with month and year dropdown navigation' },
+        { id: 'transfer', label: 'Transfer', desc: 'Dual-column list for moving items between source and target' },
       ],
     },
   ]
@@ -654,6 +667,21 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
+  private renderTransferDemo() {
+    return html`
+      ${this.tile('Interactive Demo', html`
+        <showcase-transfer
+          .source=${this.transferSource}
+          .target=${this.transferTarget}
+          @transfer-change=${(e: CustomEvent) => {
+            this.transferSource = e.detail.source
+            this.transferTarget = e.detail.target
+          }}
+        ></showcase-transfer>
+      `)}
+    `
+  }
+
   private renderContent() {
     switch (this.activeTab) {
       case 'button': return this.renderButtonDemo()
@@ -675,6 +703,7 @@ export class ShowcaseApp extends LitElement {
       case 'pagination': return this.renderPaginationDemo()
       case 'sidebar': return this.renderSidebarDemo()
       case 'upload': return this.renderUploadDemo()
+      case 'transfer': return this.renderTransferDemo()
       default: return this.renderButtonDemo()
     }
   }
@@ -905,6 +934,20 @@ export class ShowcaseApp extends LitElement {
       --upload-remove: #9ca3af;
       --upload-remove-hover: #ef4444;
       --upload-remove-bg: #fef2f2;
+      --xfer-border: #e5e7eb;
+      --xfer-header-bg: #f9fafb;
+      --xfer-header-text: #374151;
+      --xfer-meta: #9ca3af;
+      --xfer-count-bg: #f3f4f6;
+      --xfer-item-text: #1f2937;
+      --xfer-item-hover: #f9fafb;
+      --xfer-item-selected-bg: #eef2ff;
+      --xfer-check-border: #d1d5db;
+      --xfer-accent: #6366f1;
+      --xfer-btn-border: #d1d5db;
+      --xfer-btn-bg: #ffffff;
+      --xfer-btn-text: #6b7280;
+      --xfer-btn-hover: #eef2ff;
       --drawer-bg: #ffffff;
       --drawer-border: #e5e7eb;
       --drawer-title: #1e293b;
@@ -1080,6 +1123,20 @@ export class ShowcaseApp extends LitElement {
       --upload-remove: #52525b;
       --upload-remove-hover: #f87171;
       --upload-remove-bg: #450a0a;
+      --xfer-border: #27272a;
+      --xfer-header-bg: #141414;
+      --xfer-header-text: #d4d4d8;
+      --xfer-meta: #52525b;
+      --xfer-count-bg: #1c1c1c;
+      --xfer-item-text: #e4e4e7;
+      --xfer-item-hover: #141414;
+      --xfer-item-selected-bg: #1e1b4b;
+      --xfer-check-border: #3f3f46;
+      --xfer-accent: #818cf8;
+      --xfer-btn-border: #3f3f46;
+      --xfer-btn-bg: #1c1c1c;
+      --xfer-btn-text: #a1a1aa;
+      --xfer-btn-hover: #1e1b4b;
       --drawer-bg: #141414;
       --drawer-border: #27272a;
       --drawer-title: #fafafa;
