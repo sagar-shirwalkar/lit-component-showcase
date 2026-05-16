@@ -11,14 +11,14 @@ export class ShowcaseTabs extends LitElement {
     }
     .tabs {
       display: flex;
-      border-bottom: 2px solid #e2e8f0;
+      border-bottom: 2px solid var(--tabs-border, #e2e8f0);
       gap: 4px;
     }
     .tab {
       padding: 12px 20px;
       border: none;
       background: transparent;
-      color: #64748b;
+      color: var(--tabs-text, #64748b);
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -27,12 +27,12 @@ export class ShowcaseTabs extends LitElement {
       transition: all 0.2s;
     }
     .tab:hover {
-      color: #1e293b;
-      background: #f8fafc;
+      color: var(--tabs-hover-text, #1e293b);
+      background: var(--tabs-hover-bg, #f8fafc);
     }
     .tab.active {
-      color: #6366f1;
-      border-bottom-color: #6366f1;
+      color: var(--tabs-active-text, #6366f1);
+      border-bottom-color: var(--tabs-active-border, #6366f1);
     }
   `
 

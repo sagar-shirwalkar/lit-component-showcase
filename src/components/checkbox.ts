@@ -22,7 +22,7 @@ export class ShowcaseCheckbox extends LitElement {
     .checkbox {
       width: 18px;
       height: 18px;
-      border: 2px solid #d1d5db;
+      border: 2px solid var(--checkbox-border, #d1d5db);
       border-radius: 4px;
       display: flex;
       align-items: center;
@@ -31,27 +31,27 @@ export class ShowcaseCheckbox extends LitElement {
       flex-shrink: 0;
     }
     .checkbox.checked {
-      background: #6366f1;
-      border-color: #6366f1;
+      background: var(--checkbox-checked-bg, #6366f1);
+      border-color: var(--checkbox-checked-bg, #6366f1);
     }
     .checkbox.indeterminate {
-      background: #6366f1;
-      border-color: #6366f1;
+      background: var(--checkbox-checked-bg, #6366f1);
+      border-color: var(--checkbox-checked-bg, #6366f1);
     }
     .checkmark {
-      color: white;
+      color: var(--checkbox-checkmark, #ffffff);
       width: 12px;
       height: 12px;
     }
     .indeterminate-mark {
       width: 8px;
       height: 2px;
-      background: white;
+      background: var(--checkbox-checkmark, #ffffff);
       border-radius: 1px;
     }
     .label {
       font-size: 14px;
-      color: #374151;
+      color: var(--checkbox-label, #374151);
       user-select: none;
     }
   `

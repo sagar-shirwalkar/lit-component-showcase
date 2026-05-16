@@ -40,6 +40,12 @@ export class ShowcaseApp extends LitElement {
   @state() private drawerWeeklyDigest = false
   @state() private drawerAutoUpdate = true
   @state() private sidebarOpen = false
+  @state() private signupName = ''
+  @state() private signupEmail = ''
+  @state() private signupPassword = ''
+  @state() private signupAccountType = 'personal'
+  @state() private signupAgreed = false
+  @state() private signupSubmitted = false
 
   private componentGroups = [
     {
@@ -204,18 +210,83 @@ export class ShowcaseApp extends LitElement {
 
   private renderModalDemo() {
     return html`
-      ${this.tile('Interactive Demo', html`
-        <showcase-button @click=${() => this.modalOpen = true}>Open Modal</showcase-button>
+      ${this.tile('Sign Up Modal', html`
+        <showcase-button @click=${() => { this.modalOpen = true; this.signupSubmitted = false; this.signupName = ''; this.signupEmail = ''; this.signupPassword = ''; this.signupAccountType = 'personal'; this.signupAgreed = false }}>Open Sign Up</showcase-button>
         <showcase-modal
           ?open=${this.modalOpen}
-          title="Example Modal"
+          title="Create an Account"
           @close=${() => this.modalOpen = false}
         >
-          <p>This is the modal content. You can put any Lit components here.</p>
-          <div class="modal-actions">
-            <showcase-button variant="ghost" @click=${() => this.modalOpen = false}>Cancel</showcase-button>
-            <showcase-button @click=${() => this.modalOpen = false}>Confirm</showcase-button>
-          </div>
+          ${this.signupSubmitted ? html`
+            <div class="signup-success">
+              <div class="signup-success-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <h3 class="signup-success-title">Welcome, ${this.signupName || 'friend'}!</h3>
+              <p>Your account has been created. Check your inbox for a confirmation email.</p>
+              <div class="modal-actions">
+                <showcase-button @click=${() => this.modalOpen = false}>Got it</showcase-button>
+              </div>
+            </div>
+          ` : html`
+            <div class="signup-form">
+              <div class="signup-field">
+                <label class="signup-label">Full Name</label>
+                <showcase-input
+                  placeholder="Jane Doe"
+                  .value=${this.signupName}
+                  @input-change=${(e: CustomEvent) => this.signupName = e.detail.value}
+                ></showcase-input>
+              </div>
+              <div class="signup-field">
+                <label class="signup-label">Email</label>
+                <showcase-input
+                  placeholder="jane@example.com"
+                  .value=${this.signupEmail}
+                  @input-change=${(e: CustomEvent) => this.signupEmail = e.detail.value}
+                ></showcase-input>
+              </div>
+              <div class="signup-field">
+                <label class="signup-label">Password</label>
+                <showcase-input
+                  placeholder="Create a strong password"
+                  .value=${this.signupPassword}
+                  @input-change=${(e: CustomEvent) => this.signupPassword = e.detail.value}
+                ></showcase-input>
+              </div>
+              <div class="signup-field">
+                <label class="signup-label">Account Type</label>
+                <div class="signup-radio-group">
+                  <label class="signup-radio">
+                    <input type="radio" name="accountType" value="personal" ?checked=${this.signupAccountType === 'personal'} @change=${() => this.signupAccountType = 'personal'}>
+                    <span>Personal</span>
+                  </label>
+                  <label class="signup-radio">
+                    <input type="radio" name="accountType" value="business" ?checked=${this.signupAccountType === 'business'} @change=${() => this.signupAccountType = 'business'}>
+                    <span>Business</span>
+                  </label>
+                  <label class="signup-radio">
+                    <input type="radio" name="accountType" value="enterprise" ?checked=${this.signupAccountType === 'enterprise'} @change=${() => this.signupAccountType = 'enterprise'}>
+                    <span>Enterprise</span>
+                  </label>
+                </div>
+              </div>
+              <div class="signup-field">
+                <showcase-checkbox
+                  label="I agree to the Terms of Service and Privacy Policy"
+                  .checked=${this.signupAgreed}
+                  @change=${() => this.signupAgreed = !this.signupAgreed}
+                ></showcase-checkbox>
+              </div>
+            </div>
+            <div class="modal-actions">
+              <showcase-button variant="ghost" @click=${() => this.modalOpen = false}>Cancel</showcase-button>
+              <showcase-button
+                @click=${() => this.signupSubmitted = true}
+                ?disabled=${!this.signupName || !this.signupEmail || !this.signupPassword || !this.signupAgreed}
+              >Create Account</showcase-button>
+            </div>
+          `}
         </showcase-modal>
       `)}
     `
@@ -641,6 +712,130 @@ export class ShowcaseApp extends LitElement {
       --accent-dim:   #c7d2fe;
       --nav-bg:       #ffffff;
       --sidebar-bg:   #fafafa;
+      --navbar-bg:    #ffffff;
+      --navbar-border: #e5e7eb;
+      --navbar-accent: #6366f1;
+      --navbar-link:  #64748b;
+      --navbar-hover: #f1f5f9;
+      --pagination-bg: #ffffff;
+      --pagination-border: #e5e7eb;
+      --pagination-text: #374151;
+      --pagination-hover-bg: #f1f5f9;
+      --pagination-accent: #6366f1;
+      --pagination-muted: #64748b;
+      --btn-primary-bg: #6366f1;
+      --btn-primary-hover: #4f46e5;
+      --btn-primary-text: #ffffff;
+      --btn-secondary-bg: #e5e7eb;
+      --btn-secondary-hover: #d1d5db;
+      --btn-secondary-text: #1f2937;
+      --btn-danger-bg: #ef4444;
+      --btn-danger-hover: #dc2626;
+      --btn-danger-text: #ffffff;
+      --btn-ghost-text: #6366f1;
+      --btn-ghost-hover: #eef2ff;
+      --card-bg: #f9fafb;
+      --card-bg-accent: #ffffff;
+      --card-border: #e5e7eb;
+      --card-accent: #6366f1;
+      --card-title: #111827;
+      --card-body: #4b5563;
+      --input-label: #374151;
+      --input-border: #d1d5db;
+      --input-bg: #ffffff;
+      --input-text: #111827;
+      --input-focus-border: #6366f1;
+      --input-disabled-bg: #f3f4f6;
+      --input-error: #ef4444;
+      --input-filled-bg: #f3f4f6;
+      --input-filled-focus-bg: #ffffff;
+      --modal-bg: #ffffff;
+      --modal-title: #1e293b;
+      --modal-close: #64748b;
+      --modal-close-hover: #f1f5f9;
+      --modal-body: #475569;
+      --tabs-border: #e2e8f0;
+      --tabs-text: #64748b;
+      --tabs-hover-text: #1e293b;
+      --tabs-hover-bg: #f8fafc;
+      --tabs-active-text: #6366f1;
+      --tabs-active-border: #6366f1;
+      --toggle-off: #d1d5db;
+      --toggle-on: #6366f1;
+      --toggle-thumb: #ffffff;
+      --toggle-label: #374151;
+      --alert-info-bg: #eff6ff;
+      --alert-info-border: #bfdbfe;
+      --alert-info-text: #1e40af;
+      --alert-success-bg: #f0fdf4;
+      --alert-success-border: #bbf7d0;
+      --alert-success-text: #166534;
+      --alert-warning-bg: #fffbeb;
+      --alert-warning-border: #fde68a;
+      --alert-warning-text: #92400e;
+      --alert-error-bg: #fef2f2;
+      --alert-error-border: #fecaca;
+      --alert-error-text: #991b1b;
+      --badge-default-bg: #f3f4f6;
+      --badge-default-text: #4b5563;
+      --badge-primary-bg: #eef2ff;
+      --badge-primary-text: #6366f1;
+      --badge-success-bg: #f0fdf4;
+      --badge-success-text: #16a34a;
+      --badge-warning-bg: #fffbeb;
+      --badge-warning-text: #d97706;
+      --badge-danger-bg: #fef2f2;
+      --badge-danger-text: #dc2626;
+      --dropdown-trigger-bg: #ffffff;
+      --dropdown-trigger-border: #d1d5db;
+      --dropdown-trigger-text: #374151;
+      --dropdown-trigger-hover: #f5f3ff;
+      --dropdown-arrow: #6b7280;
+      --dropdown-menu-bg: #ffffff;
+      --dropdown-menu-border: #e5e7eb;
+      --dropdown-accent: #6366f1;
+      --dropdown-item-text: #374151;
+      --dropdown-item-hover: #f3f4f6;
+      --accordion-border: #e5e7eb;
+      --accordion-header-bg: #f9fafb;
+      --accordion-header-hover: #f3f4f6;
+      --accordion-header-text: #374151;
+      --accordion-body-text: #4b5563;
+      --cal-bg: #ffffff;
+      --cal-border: #e5e7eb;
+      --cal-nav-color: #64748b;
+      --cal-nav-hover: #f1f5f9;
+      --cal-weekday: #64748b;
+      --cal-day-text: #374151;
+      --cal-day-hover: #f1f5f9;
+      --cal-today: #6366f1;
+      --cal-selected-bg: #6366f1;
+      --cal-selected-text: #ffffff;
+      --cal-other-month: #d1d5db;
+      --table-header-bg: #f8fafc;
+      --table-header-text: #475569;
+      --table-border: #e2e8f0;
+      --table-text: #1e293b;
+      --table-row-hover: #f8fafc;
+      --table-page-info: #64748b;
+      --table-btn-bg: #ffffff;
+      --table-btn-hover: #f1f5f9;
+      --table-accent: #6366f1;
+      --table-btn-active-text: #ffffff;
+      --checkbox-border: #d1d5db;
+      --checkbox-checked-bg: #6366f1;
+      --checkbox-checkmark: #ffffff;
+      --checkbox-label: #374151;
+      --slider-label: #374151;
+      --slider-value: #6366f1;
+      --slider-track: #e5e7eb;
+      --slider-thumb: #6366f1;
+      --drawer-bg: #ffffff;
+      --drawer-border: #e5e7eb;
+      --drawer-title: #1e293b;
+      --drawer-close: #64748b;
+      --drawer-close-hover: #f1f5f9;
+      --drawer-body: #475569;
 
       background: var(--bg);
       color: var(--text-1);
@@ -659,6 +854,130 @@ export class ShowcaseApp extends LitElement {
       --accent-dim:   #3730a3;
       --nav-bg:       #0d0d0d;
       --sidebar-bg:   #0d0d0d;
+      --navbar-bg:    #141414;
+      --navbar-border: #27272a;
+      --navbar-accent: #818cf8;
+      --navbar-link:  #a1a1aa;
+      --navbar-hover: #1c1c1c;
+      --pagination-bg: #1c1c1c;
+      --pagination-border: #27272a;
+      --pagination-text: #d4d4d8;
+      --pagination-hover-bg: #27272a;
+      --pagination-accent: #818cf8;
+      --pagination-muted: #52525b;
+      --btn-primary-bg: #818cf8;
+      --btn-primary-hover: #6366f1;
+      --btn-primary-text: #ffffff;
+      --btn-secondary-bg: #27272a;
+      --btn-secondary-hover: #3f3f46;
+      --btn-secondary-text: #d4d4d8;
+      --btn-danger-bg: #ef4444;
+      --btn-danger-hover: #dc2626;
+      --btn-danger-text: #ffffff;
+      --btn-ghost-text: #818cf8;
+      --btn-ghost-hover: #1e1b4b;
+      --card-bg: #141414;
+      --card-bg-accent: #1c1c1c;
+      --card-border: #27272a;
+      --card-accent: #818cf8;
+      --card-title: #fafafa;
+      --card-body: #a1a1aa;
+      --input-label: #a1a1aa;
+      --input-border: #3f3f46;
+      --input-bg: #1c1c1c;
+      --input-text: #e4e4e7;
+      --input-focus-border: #818cf8;
+      --input-disabled-bg: #18181b;
+      --input-error: #f87171;
+      --input-filled-bg: #18181b;
+      --input-filled-focus-bg: #1c1c1c;
+      --modal-bg: #141414;
+      --modal-title: #fafafa;
+      --modal-close: #a1a1aa;
+      --modal-close-hover: #27272a;
+      --modal-body: #a1a1aa;
+      --tabs-border: #27272a;
+      --tabs-text: #a1a1aa;
+      --tabs-hover-text: #fafafa;
+      --tabs-hover-bg: #18181b;
+      --tabs-active-text: #818cf8;
+      --tabs-active-border: #818cf8;
+      --toggle-off: #3f3f46;
+      --toggle-on: #818cf8;
+      --toggle-thumb: #ffffff;
+      --toggle-label: #a1a1aa;
+      --alert-info-bg: #0f172a;
+      --alert-info-border: #1e40af;
+      --alert-info-text: #93c5fd;
+      --alert-success-bg: #052e16;
+      --alert-success-border: #166534;
+      --alert-success-text: #86efac;
+      --alert-warning-bg: #451a03;
+      --alert-warning-border: #92400e;
+      --alert-warning-text: #fcd34d;
+      --alert-error-bg: #450a0a;
+      --alert-error-border: #991b1b;
+      --alert-error-text: #fca5a5;
+      --badge-default-bg: #27272a;
+      --badge-default-text: #a1a1aa;
+      --badge-primary-bg: #1e1b4b;
+      --badge-primary-text: #818cf8;
+      --badge-success-bg: #052e16;
+      --badge-success-text: #22c55e;
+      --badge-warning-bg: #451a03;
+      --badge-warning-text: #f59e0b;
+      --badge-danger-bg: #450a0a;
+      --badge-danger-text: #ef4444;
+      --dropdown-trigger-bg: #1c1c1c;
+      --dropdown-trigger-border: #3f3f46;
+      --dropdown-trigger-text: #d4d4d8;
+      --dropdown-trigger-hover: #18181b;
+      --dropdown-arrow: #a1a1aa;
+      --dropdown-menu-bg: #1c1c1c;
+      --dropdown-menu-border: #27272a;
+      --dropdown-accent: #818cf8;
+      --dropdown-item-text: #d4d4d8;
+      --dropdown-item-hover: #27272a;
+      --accordion-border: #27272a;
+      --accordion-header-bg: #141414;
+      --accordion-header-hover: #1c1c1c;
+      --accordion-header-text: #d4d4d8;
+      --accordion-body-text: #a1a1aa;
+      --cal-bg: #141414;
+      --cal-border: #27272a;
+      --cal-nav-color: #a1a1aa;
+      --cal-nav-hover: #27272a;
+      --cal-weekday: #a1a1aa;
+      --cal-day-text: #d4d4d8;
+      --cal-day-hover: #27272a;
+      --cal-today: #818cf8;
+      --cal-selected-bg: #818cf8;
+      --cal-selected-text: #ffffff;
+      --cal-other-month: #3f3f46;
+      --table-header-bg: #141414;
+      --table-header-text: #a1a1aa;
+      --table-border: #27272a;
+      --table-text: #d4d4d8;
+      --table-row-hover: #141414;
+      --table-page-info: #52525b;
+      --table-btn-bg: #1c1c1c;
+      --table-btn-hover: #27272a;
+      --table-accent: #818cf8;
+      --table-btn-active-text: #ffffff;
+      --checkbox-border: #3f3f46;
+      --checkbox-checked-bg: #818cf8;
+      --checkbox-checkmark: #ffffff;
+      --checkbox-label: #d4d4d8;
+      --slider-label: #a1a1aa;
+      --slider-value: #818cf8;
+      --slider-track: #3f3f46;
+      --slider-thumb: #818cf8;
+      --drawer-bg: #141414;
+      --drawer-border: #27272a;
+      --drawer-title: #fafafa;
+      --drawer-close: #a1a1aa;
+      --drawer-close-hover: #27272a;
+      --drawer-body: #a1a1aa;
     }
 
     /* ── Shell ── */
@@ -931,6 +1250,70 @@ export class ShowcaseApp extends LitElement {
       gap: 8px;
       justify-content: flex-end;
       margin-top: 20px;
+    }
+
+    /* ── Sign up modal ── */
+    .signup-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .signup-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .signup-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-2);
+      letter-spacing: 0.01em;
+    }
+
+    .signup-radio-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .signup-radio {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--text-1);
+    }
+
+    .signup-radio input[type="radio"] {
+      accent-color: var(--accent);
+      margin: 0;
+    }
+
+    .signup-success {
+      text-align: center;
+      padding: 16px 0;
+    }
+
+    .signup-success-icon {
+      color: #22c55e;
+      margin-bottom: 8px;
+    }
+
+    .signup-success-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: var(--text-1);
+    }
+
+    .signup-success p {
+      font-size: 14px;
+      color: var(--text-2);
+      margin: 0 0 4px;
+      line-height: 1.6;
     }
 
     /* ── Drawer content ── */

@@ -36,14 +36,14 @@ export class ShowcaseButton extends LitElement {
     .md { padding: 10px 20px; font-size: 16px; }
     .lg { padding: 14px 28px; font-size: 18px; }
     /* Variants */
-    .primary { background: #6366f1; color: white; }
-    .primary:hover:not(:disabled) { background: #4f46e5; }
-    .secondary { background: #e5e7eb; color: #1f2937; }
-    .secondary:hover:not(:disabled) { background: #d1d5db; }
-    .danger { background: #ef4444; color: white; }
-    .danger:hover:not(:disabled) { background: #dc2626; }
-    .ghost { background: transparent; color: #6366f1; border: 1px solid #6366f1; }
-    .ghost:hover:not(:disabled) { background: #eef2ff; }
+    .primary { background: var(--btn-primary-bg, #6366f1); color: var(--btn-primary-text, white); }
+    .primary:hover:not(:disabled) { background: var(--btn-primary-hover, #4f46e5); }
+    .secondary { background: var(--btn-secondary-bg, #e5e7eb); color: var(--btn-secondary-text, #1f2937); }
+    .secondary:hover:not(:disabled) { background: var(--btn-secondary-hover, #d1d5db); }
+    .danger { background: var(--btn-danger-bg, #ef4444); color: var(--btn-danger-text, white); }
+    .danger:hover:not(:disabled) { background: var(--btn-danger-hover, #dc2626); }
+    .ghost { background: transparent; color: var(--btn-ghost-text, #6366f1); border: 1px solid var(--btn-ghost-text, #6366f1); }
+    .ghost:hover:not(:disabled) { background: var(--btn-ghost-hover, #eef2ff); }
     .spinner {
       width: 16px;
       height: 16px;

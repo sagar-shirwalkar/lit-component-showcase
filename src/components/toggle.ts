@@ -27,12 +27,12 @@ export class ShowcaseToggle extends LitElement {
       position: relative;
       width: 48px;
       height: 26px;
-      background: #d1d5db;
+      background: var(--toggle-off, #d1d5db);
       border-radius: 13px;
       transition: background 0.2s;
     }
     .toggle.checked {
-      background: #6366f1;
+      background: var(--toggle-on, #6366f1);
     }
     .toggle-thumb {
       position: absolute;
@@ -40,10 +40,10 @@ export class ShowcaseToggle extends LitElement {
       left: 3px;
       width: 20px;
       height: 20px;
-      background: white;
+      background: var(--toggle-thumb, #ffffff);
       border-radius: 50%;
       transition: transform 0.2s;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      box-shadow: var(--toggle-thumb-shadow, 0 1px 3px rgba(0,0,0,0.2));
     }
     .toggle.checked .toggle-thumb {
       transform: translateX(22px);
@@ -51,7 +51,7 @@ export class ShowcaseToggle extends LitElement {
     .label {
       font-size: 14px;
       font-weight: 500;
-      color: #374151;
+      color: var(--toggle-label, #374151);
     }
   `
 

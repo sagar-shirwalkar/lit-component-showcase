@@ -26,48 +26,49 @@ export class ShowcaseInput extends LitElement {
     label {
       font-size: 14px;
       font-weight: 500;
-      color: #374151;
+      color: var(--input-label, #374151);
     }
     input {
       padding: 10px 14px;
       border-radius: 8px;
-      border: 1px solid #d1d5db;
+      border: 1px solid var(--input-border, #d1d5db);
       font-size: 16px;
       font-family: inherit;
       transition: all 0.2s;
       outline: none;
+      background: var(--input-bg, #ffffff);
+      color: var(--input-text, #111827);
     }
     input:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      border-color: var(--input-focus-border, #6366f1);
+      box-shadow: 0 0 0 3px var(--input-focus-ring, rgba(99, 102, 241, 0.1));
     }
     input:disabled {
-      background: #f3f4f6;
+      background: var(--input-disabled-bg, #f3f4f6);
       cursor: not-allowed;
     }
     .error input {
-      border-color: #ef4444;
+      border-color: var(--input-error, #ef4444);
     }
     .error input:focus {
-      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      box-shadow: 0 0 0 3px var(--input-error-ring, rgba(239, 68, 68, 0.1));
     }
     .error-message {
       font-size: 13px;
-      color: #ef4444;
+      color: var(--input-error, #ef4444);
     }
-    /* Variants */
     .filled input {
-      background: #f3f4f6;
+      background: var(--input-filled-bg, #f3f4f6);
       border-color: transparent;
     }
     .filled input:focus {
-      background: white;
-      border-color: #6366f1;
+      background: var(--input-filled-focus-bg, #ffffff);
+      border-color: var(--input-focus-border, #6366f1);
     }
     .outlined input {
       background: transparent;
       border-width: 2px;
-      border-color: #6366f1;
+      border-color: var(--input-focus-border, #6366f1);
     }
   `
 

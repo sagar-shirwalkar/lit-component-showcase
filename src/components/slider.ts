@@ -23,11 +23,11 @@ export class ShowcaseSlider extends LitElement {
       display: flex;
       justify-content: space-between;
       font-size: 14px;
-      color: #374151;
+      color: var(--slider-label, #374151);
     }
     .value {
       font-weight: 600;
-      color: #6366f1;
+      color: var(--slider-value, #6366f1);
     }
     .slider-container {
       position: relative;
@@ -37,17 +37,19 @@ export class ShowcaseSlider extends LitElement {
     }
     input[type="range"] {
       -webkit-appearance: none;
+      appearance: none;
       width: 100%;
       height: 6px;
-      background: #e5e7eb;
+      background: var(--slider-track, #e5e7eb);
       border-radius: 3px;
       outline: none;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
+      appearance: none;
       width: 20px;
       height: 20px;
-      background: #6366f1;
+      background: var(--slider-thumb, #6366f1);
       border-radius: 50%;
       cursor: pointer;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -59,7 +61,7 @@ export class ShowcaseSlider extends LitElement {
     input[type="range"]::-moz-range-thumb {
       width: 20px;
       height: 20px;
-      background: #6366f1;
+      background: var(--slider-thumb, #6366f1);
       border-radius: 50%;
       cursor: pointer;
       border: none;

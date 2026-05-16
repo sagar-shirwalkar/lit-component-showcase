@@ -55,26 +55,25 @@ export class ShowcaseAlert extends LitElement {
     .close:hover {
       opacity: 1;
     }
-    /* Types */
     .info {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e40af;
+      background: var(--alert-info-bg, #eff6ff);
+      border: 1px solid var(--alert-info-border, #bfdbfe);
+      color: var(--alert-info-text, #1e40af);
     }
     .success {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #166534;
+      background: var(--alert-success-bg, #f0fdf4);
+      border: 1px solid var(--alert-success-border, #bbf7d0);
+      color: var(--alert-success-text, #166534);
     }
     .warning {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
-      color: #92400e;
+      background: var(--alert-warning-bg, #fffbeb);
+      border: 1px solid var(--alert-warning-border, #fde68a);
+      color: var(--alert-warning-text, #92400e);
     }
     .error {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #991b1b;
+      background: var(--alert-error-bg, #fef2f2);
+      border: 1px solid var(--alert-error-border, #fecaca);
+      color: var(--alert-error-text, #991b1b);
     }
   `
 

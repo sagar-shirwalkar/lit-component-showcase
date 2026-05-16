@@ -28,30 +28,30 @@ export class ShowcaseDataTable extends LitElement {
     th {
       text-align: left;
       padding: 12px 16px;
-      background: #f8fafc;
+      background: var(--table-header-bg, #f8fafc);
       font-weight: 600;
-      color: #475569;
-      border-bottom: 2px solid #e2e8f0;
+      color: var(--table-header-text, #475569);
+      border-bottom: 2px solid var(--table-border, #e2e8f0);
     }
     td {
       padding: 12px 16px;
-      border-bottom: 1px solid #e2e8f0;
-      color: #1e293b;
+      border-bottom: 1px solid var(--table-border, #e2e8f0);
+      color: var(--table-text, #1e293b);
     }
     tr:hover td {
-      background: #f8fafc;
+      background: var(--table-row-hover, #f8fafc);
     }
     .pagination {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 16px 0;
-      border-top: 1px solid #e2e8f0;
+      border-top: 1px solid var(--table-border, #e2e8f0);
       margin-top: 8px;
     }
     .page-info {
       font-size: 14px;
-      color: #64748b;
+      color: var(--table-page-info, #64748b);
     }
     .page-controls {
       display: flex;
@@ -59,21 +59,22 @@ export class ShowcaseDataTable extends LitElement {
     }
     .page-btn {
       padding: 6px 12px;
-      border: 1px solid #e2e8f0;
-      background: white;
+      border: 1px solid var(--table-border, #e2e8f0);
+      background: var(--table-btn-bg, #ffffff);
       border-radius: 6px;
       font-size: 14px;
       cursor: pointer;
+      color: var(--table-text, #1e293b);
       transition: all 0.2s;
     }
     .page-btn:hover:not(:disabled) {
-      background: #f1f5f9;
-      border-color: #6366f1;
+      background: var(--table-btn-hover, #f1f5f9);
+      border-color: var(--table-accent, #6366f1);
     }
     .page-btn.active {
-      background: #6366f1;
-      color: white;
-      border-color: #6366f1;
+      background: var(--table-accent, #6366f1);
+      color: var(--table-btn-active-text, #ffffff);
+      border-color: var(--table-accent, #6366f1);
     }
     .page-btn:disabled {
       opacity: 0.5;
