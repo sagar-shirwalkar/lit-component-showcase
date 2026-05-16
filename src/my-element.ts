@@ -10,16 +10,28 @@ import './components/alert.ts'
 import './components/badge.ts'
 import './components/dropdown.ts'
 import './components/accordion.ts'
+import './components/calendar.ts'
+import './components/data-table.ts'
+import './components/navbar.ts'
+import './components/checkbox.ts'
+import './components/slider.ts'
+import './components/drawer.ts'
+import './components/pagination.ts'
 
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
   @state() private activeTab = 'button'
   @state() private modalOpen = false
   @state() private toggleState = false
-
   @state() private dropdownOpen = false
   @state() private inputValue = ''
   @state() private accordionOpen = new Set(['item-1'])
+  @state() private drawerOpen = false
+  @state() private selectedDate?: number
+  @state() private sliderValue = 50
+  @state() private checkboxStates = new Map<string, boolean>()
+  @state() private tablePage = 1
+  @state() private paginationPage = 1
 
   private tabs = [
     { id: 'button', label: 'Button' },
@@ -32,6 +44,13 @@ export class ShowcaseApp extends LitElement {
     { id: 'badge', label: 'Badge' },
     { id: 'dropdown', label: 'Dropdown' },
     { id: 'accordion', label: 'Accordion' },
+    { id: 'calendar', label: 'Calendar' },
+    { id: 'data-table', label: 'Data Table' },
+    { id: 'navbar', label: 'Navbar' },
+    { id: 'checkbox', label: 'Checkbox' },
+    { id: 'slider', label: 'Slider' },
+    { id: 'drawer', label: 'Drawer' },
+    { id: 'pagination', label: 'Pagination' },
   ]
 
   private toggleAccordion(id: string) {
@@ -42,6 +61,12 @@ export class ShowcaseApp extends LitElement {
       newSet.add(id)
     }
     this.accordionOpen = newSet
+  }
+
+  private toggleCheckbox(id: string) {
+    const newMap = new Map(this.checkboxStates)
+    newMap.set(id, !newMap.get(id))
+    this.checkboxStates = newMap
   }
 
   private renderButtonDemo() {
@@ -275,6 +300,162 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
+  private renderCalendarDemo() {
+    return html`
+      <div class="demo-section">
+        <h2>Date Picker Calendar</h2>
+        <div class="demo-stack">
+          <showcase-calendar 
+            .value=${this.selectedDate}
+            @change=${(e: CustomEvent) => this.selectedDate = e.detail.date.getDate()}
+          ></showcase-calendar>
+          ${this.selectedDate ? html`<p>Selected: Day ${this.selectedDate} of the current month</p>` : html`<p>Click a date to select it</p>`}
+        </div>
+      </div>
+    `
+  }
+
+  private renderDataTableDemo() {
+    const columns = [
+      { key: 'id', header: 'ID' },
+      { key: 'name', header: 'Name' },
+      { key: 'email', header: 'Email' },
+      { key: 'role', header: 'Role', render: (value: string) => html`<span class="role-badge">${value}</span>` },
+    ]
+    
+    const data = [
+      { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin' },
+      { id: 2, name: 'Bob Smith', email: 'bob@example.com', role: 'User' },
+      { id: 3, name: 'Charlie Brown', email: 'charlie@example.com', role: 'User' },
+      { id: 4, name: 'Diana Prince', email: 'diana@example.com', role: 'Editor' },
+      { id: 5, name: 'Edward King', email: 'edward@example.com', role: 'User' },
+      { id: 6, name: 'Fiona Green', email: 'fiona@example.com', role: 'Admin' },
+      { id: 7, name: 'George Hill', email: 'george@example.com', role: 'User' },
+      { id: 8, name: 'Hannah Lee', email: 'hannah@example.com', role: 'Editor' },
+    ]
+
+    return html`
+      <div class="demo-section">
+        <h2>Data Table</h2>
+        <showcase-data-table 
+          .columns=${columns}
+          .data=${data}
+          .pageSize=${5}
+          .currentPage=${this.tablePage}
+          @page-change=${(e: CustomEvent) => this.tablePage = e.detail.page}
+        ></showcase-data-table>
+      </div>
+    `
+  }
+
+  private renderNavbarDemo() {
+    return html`
+      <div class="demo-section">
+        <h2>Navigation Bar</h2>
+        <showcase-navbar 
+          brand="MyApp"
+          .links=${[
+            { label: 'Home', href: '#' },
+            { label: 'About', href: '#' },
+            { label: 'Services', href: '#' },
+            { label: 'Contact', href: '#' },
+          ]}
+        ></showcase-navbar>
+      </div>
+    `
+  }
+
+  private renderCheckboxDemo() {
+    return html`
+      <div class="demo-section">
+        <h2>Checkboxes</h2>
+        <div class="demo-stack">
+          <showcase-checkbox 
+            label="Accept terms and conditions"
+            .checked=${this.checkboxStates.get('terms') || false}
+            @change=${() => this.toggleCheckbox('terms')}
+          ></showcase-checkbox>
+          <showcase-checkbox 
+            label="Subscribe to newsletter"
+            .checked=${this.checkboxStates.get('newsletter') || false}
+            @change=${() => this.toggleCheckbox('newsletter')}
+          ></showcase-checkbox>
+          <showcase-checkbox 
+            label="Disabled option"
+            .checked=${true}
+            disabled
+          ></showcase-checkbox>
+        </div>
+      </div>
+    `
+  }
+
+  private renderSliderDemo() {
+    return html`
+      <div class="demo-section">
+        <h2>Range Slider</h2>
+        <div class="demo-stack">
+          <showcase-slider 
+            label="Volume"
+            .value=${this.sliderValue}
+            .min=${0}
+            .max=${100}
+            @change=${(e: CustomEvent) => this.sliderValue = e.detail.value}
+          ></showcase-slider>
+          <showcase-slider 
+            label="Price Range"
+            .value=${75}
+            .min=${0}
+            .max=${500}
+            .step=${25}
+          ></showcase-slider>
+        </div>
+      </div>
+    `
+  }
+
+  private renderDrawerDemo() {
+    return html`
+      <div class="demo-section">
+        <h2>Right Drawer</h2>
+        <showcase-button @click=${() => this.drawerOpen = true}>Open Drawer</showcase-button>
+        
+        <showcase-drawer 
+          ?open=${this.drawerOpen}
+          title="Settings"
+          @close=${() => this.drawerOpen = false}
+        >
+          <div class="drawer-content">
+            <p>This is the drawer content. It slides in from the right side.</p>
+            <br>
+            <showcase-checkbox label="Enable notifications"></showcase-checkbox>
+            <br>
+            <showcase-checkbox label="Dark mode"></showcase-checkbox>
+            <br>
+            <showcase-checkbox label="Auto-update"></showcase-checkbox>
+          </div>
+        </showcase-drawer>
+      </div>
+    `
+  }
+
+  private renderPaginationDemo() {
+    return html`
+      <div class="demo-section">
+        <h2>Pagination</h2>
+        <div class="demo-stack">
+          <showcase-pagination 
+            .totalItems=${100}
+            .pageSize=${10}
+            .currentPage=${this.paginationPage}
+            @page-change=${(e: CustomEvent) => this.paginationPage = e.detail.page}
+          ></showcase-pagination>
+          <p>Current page: ${this.paginationPage}</p>
+        </div>
+      </div>
+    `
+  }
+
   private renderContent() {
     switch (this.activeTab) {
       case 'button': return this.renderButtonDemo()
@@ -287,6 +468,13 @@ export class ShowcaseApp extends LitElement {
       case 'badge': return this.renderBadgeDemo()
       case 'dropdown': return this.renderDropdownDemo()
       case 'accordion': return this.renderAccordionDemo()
+      case 'calendar': return this.renderCalendarDemo()
+      case 'data-table': return this.renderDataTableDemo()
+      case 'navbar': return this.renderNavbarDemo()
+      case 'checkbox': return this.renderCheckboxDemo()
+      case 'slider': return this.renderSliderDemo()
+      case 'drawer': return this.renderDrawerDemo()
+      case 'pagination': return this.renderPaginationDemo()
       default: return this.renderButtonDemo()
     }
   }
@@ -350,32 +538,32 @@ export class ShowcaseApp extends LitElement {
     .nav {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 4px;
       justify-content: center;
       margin-bottom: 40px;
-      padding: 16px;
-      background: white;
+      padding: 8px;
+      background: #f1f5f9;
       border-radius: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .nav-btn {
-      padding: 8px 16px;
+      padding: 10px 20px;
       border: none;
       background: transparent;
       color: #64748b;
       font-size: 14px;
       font-weight: 500;
-      border-radius: 6px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s;
     }
     .nav-btn:hover {
-      background: #f1f5f9;
+      background: #e2e8f0;
       color: #1e293b;
     }
     .nav-btn.active {
-      background: #6366f1;
-      color: white;
+      background: white;
+      color: #6366f1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .main {
       background: white;
@@ -433,6 +621,18 @@ export class ShowcaseApp extends LitElement {
       padding-top: 24px;
       border-top: 1px solid #e2e8f0;
       color: #64748b;
+    }
+    .drawer-content {
+      color: #475569;
+    }
+    .role-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #eef2ff;
+      color: #6366f1;
     }
   `
 }
