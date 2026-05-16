@@ -299,14 +299,25 @@ export class ShowcaseApp extends LitElement {
           .activeTab=${this.tabsDemoActive}
           @tab-change=${(e: CustomEvent) => this.tabsDemoActive = e.detail.tab}
         >
-          <showcase-tab tab="tab1" label="Overview"></showcase-tab>
-          <showcase-tab tab="tab2" label="Details"></showcase-tab>
-          <showcase-tab tab="tab3" label="Settings"></showcase-tab>
+          <showcase-tab tab="tab1" label="Overview" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`}></showcase-tab>
+          <showcase-tab tab="tab2" label="Details" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`}></showcase-tab>
+          <showcase-tab tab="tab3" label="Settings" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`}></showcase-tab>
         </showcase-tabs>
         <div class="tab-content">
-          ${this.tabsDemoActive === 'tab1' ? html`<p>Overview content goes here.</p>` : ''}
-          ${this.tabsDemoActive === 'tab2' ? html`<p>Details content goes here.</p>` : ''}
-          ${this.tabsDemoActive === 'tab3' ? html`<p>Settings content goes here.</p>` : ''}
+          ${this.tabsDemoActive === 'tab1' ? html`
+            <div class="tab-demo-flex">
+              <div class="tab-stat"><span class="tab-stat-value">2,847</span><span class="tab-stat-label">Active Users</span></div>
+              <div class="tab-stat"><span class="tab-stat-value">94%</span><span class="tab-stat-label">Uptime</span></div>
+              <div class="tab-stat"><span class="tab-stat-value">12</span><span class="tab-stat-label">Projects</span></div>
+            </div>
+          ` : ''}
+          ${this.tabsDemoActive === 'tab2' ? html`<p>Details panel with additional information about the selected item.</p>` : ''}
+          ${this.tabsDemoActive === 'tab3' ? html`
+            <div class="demo-stack">
+              <showcase-toggle label="Email notifications"></showcase-toggle>
+              <showcase-toggle label="Two-factor authentication" .checked=${true}></showcase-toggle>
+            </div>
+          ` : ''}
         </div>
       `)}
     `
@@ -755,11 +766,14 @@ export class ShowcaseApp extends LitElement {
       --modal-close-hover: #f1f5f9;
       --modal-body: #475569;
       --tabs-border: #e2e8f0;
+      --tabs-bar-bg: #f1f5f9;
       --tabs-text: #64748b;
-      --tabs-hover-text: #1e293b;
-      --tabs-hover-bg: #f8fafc;
+      --tabs-hover-text: #334155;
+      --tabs-hover-bg: rgba(255,255,255,0.6);
       --tabs-active-text: #6366f1;
       --tabs-active-border: #6366f1;
+      --tabs-active-bg: #ffffff;
+      --tabs-active-shadow: 0 1px 3px rgba(0,0,0,0.1);
       --toggle-off: #d1d5db;
       --toggle-on: #6366f1;
       --toggle-thumb: #ffffff;
@@ -897,11 +911,14 @@ export class ShowcaseApp extends LitElement {
       --modal-close-hover: #27272a;
       --modal-body: #a1a1aa;
       --tabs-border: #27272a;
+      --tabs-bar-bg: #18181b;
       --tabs-text: #a1a1aa;
       --tabs-hover-text: #fafafa;
-      --tabs-hover-bg: #18181b;
+      --tabs-hover-bg: rgba(255,255,255,0.05);
       --tabs-active-text: #818cf8;
       --tabs-active-border: #818cf8;
+      --tabs-active-bg: #1c1c1c;
+      --tabs-active-shadow: 0 1px 3px rgba(0,0,0,0.3);
       --toggle-off: #3f3f46;
       --toggle-on: #818cf8;
       --toggle-thumb: #ffffff;
@@ -1235,15 +1252,41 @@ export class ShowcaseApp extends LitElement {
 
     .tab-content {
       margin-top: 14px;
-      padding: 16px;
+      padding: 20px;
       background: var(--surface-2);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 10px;
       font-size: 14px;
       color: var(--text-2);
     }
 
     .tab-content p { margin: 0; }
+
+    .tab-demo-flex {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .tab-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .tab-stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.03em;
+    }
+
+    .tab-stat-label {
+      font-size: 12px;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
     .modal-actions {
       display: flex;
