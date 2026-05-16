@@ -21,6 +21,8 @@ import './components/pagination.ts'
 import './components/sidebar.ts'
 import './components/upload.ts'
 import './components/transfer.ts'
+import './components/timeline.ts'
+import './components/notification.ts'
 
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
@@ -55,6 +57,15 @@ export class ShowcaseApp extends LitElement {
     { id: 'kt', label: 'Kotlin' },
   ]
   @state() private transferTarget: { id: string; label: string }[] = []
+  @state() private timelineItems = [
+    { id: 't1', title: 'Project Kickoff', description: 'Initial team meeting and stakeholder alignment.', completed: true, date: '2025-01-15', time: '09:00' },
+    { id: 't2', title: 'Requirements Gathering', description: 'Document all functional and technical requirements.', completed: true, date: '2025-02-01', time: '14:30' },
+    { id: 't3', title: 'Design Phase', description: 'Wireframes, mockups, and architecture review.', completed: true, date: '2025-03-10' },
+    { id: 't4', title: 'Development Sprint', description: 'Core development and feature implementation.', completed: false },
+    { id: 't5', title: 'Testing & QA', description: 'Integration testing, bug fixes, and performance tuning.', completed: false },
+    { id: 't6', title: 'Deployment', description: 'Production release and monitoring setup.', completed: false },
+  ]
+  @state() private showNotification = false
   @state() private signupName = ''
   @state() private signupEmail = ''
   @state() private signupPassword = ''
@@ -80,6 +91,7 @@ export class ShowcaseApp extends LitElement {
         { id: 'card', label: 'Card', desc: 'Content container with default, bordered, and elevated variants' },
         { id: 'badge', label: 'Badge', desc: 'Compact label for statuses, tags, and counts' },
         { id: 'alert', label: 'Alert', desc: 'Contextual message with four severity levels' },
+        { id: 'notification', label: 'Notification', desc: 'Temporary toast that slides in from the top-right' },
       ],
     },
     {
@@ -106,6 +118,7 @@ export class ShowcaseApp extends LitElement {
         { id: 'data-table', label: 'Data Table', desc: 'Tabular data display with built-in pagination' },
         { id: 'calendar', label: 'Calendar', desc: 'Date picker with month and year dropdown navigation' },
         { id: 'transfer', label: 'Transfer', desc: 'Dual-column list for moving items between source and target' },
+        { id: 'timeline', label: 'Timeline', desc: 'Vertical timeline with completion states and date tracking' },
       ],
     },
   ]
@@ -682,6 +695,28 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
+  private renderTimelineDemo() {
+    return html`
+      ${this.tile('Project Milestones', html`
+        <showcase-timeline .items=${this.timelineItems}></showcase-timeline>
+      `)}
+    `
+  }
+
+  private renderNotificationDemo() {
+    return html`
+      ${this.tile('Trigger Notification', html`
+        <showcase-button @click=${() => this.showNotification = true}>Show Notification</showcase-button>
+        <showcase-notification
+          .open=${this.showNotification}
+          title="Update Available"
+          message="Version 2.4.1 is ready to install. Restart the app to apply the latest changes."
+          @close=${() => this.showNotification = false}
+        ></showcase-notification>
+      `)}
+    `
+  }
+
   private renderContent() {
     switch (this.activeTab) {
       case 'button': return this.renderButtonDemo()
@@ -692,6 +727,7 @@ export class ShowcaseApp extends LitElement {
       case 'toggle': return this.renderToggleDemo()
       case 'alert': return this.renderAlertDemo()
       case 'badge': return this.renderBadgeDemo()
+      case 'notification': return this.renderNotificationDemo()
       case 'dropdown': return this.renderDropdownDemo()
       case 'accordion': return this.renderAccordionDemo()
       case 'calendar': return this.renderCalendarDemo()
@@ -704,6 +740,7 @@ export class ShowcaseApp extends LitElement {
       case 'sidebar': return this.renderSidebarDemo()
       case 'upload': return this.renderUploadDemo()
       case 'transfer': return this.renderTransferDemo()
+      case 'timeline': return this.renderTimelineDemo()
       default: return this.renderButtonDemo()
     }
   }
@@ -948,6 +985,25 @@ export class ShowcaseApp extends LitElement {
       --xfer-btn-bg: #ffffff;
       --xfer-btn-text: #6b7280;
       --xfer-btn-hover: #eef2ff;
+      --tl-line: #e5e7eb;
+      --tl-icon-bg: #ffffff;
+      --tl-accent: #6366f1;
+      --tl-card-bg: #ffffff;
+      --tl-card-border: #e5e7eb;
+      --tl-title: #1f2937;
+      --tl-title-done: #16a34a;
+      --tl-desc: #6b7280;
+      --tl-date: #64748b;
+      --tl-time: #94a3b8;
+      --notif-bg: #ffffff;
+      --notif-border: #e5e7eb;
+      --notif-shadow: 0 6px 24px rgba(0,0,0,0.12);
+      --notif-accent-bg: #eef2ff;
+      --notif-accent: #6366f1;
+      --notif-title: #1f2937;
+      --notif-message: #6b7280;
+      --notif-close: #9ca3af;
+      --notif-close-hover: #374151;
       --drawer-bg: #ffffff;
       --drawer-border: #e5e7eb;
       --drawer-title: #1e293b;
@@ -1137,6 +1193,25 @@ export class ShowcaseApp extends LitElement {
       --xfer-btn-bg: #1c1c1c;
       --xfer-btn-text: #a1a1aa;
       --xfer-btn-hover: #1e1b4b;
+      --tl-line: #27272a;
+      --tl-icon-bg: #1c1c1c;
+      --tl-accent: #818cf8;
+      --tl-card-bg: #1c1c1c;
+      --tl-card-border: #27272a;
+      --tl-title: #e4e4e7;
+      --tl-title-done: #4ade80;
+      --tl-desc: #a1a1aa;
+      --tl-date: #a1a1aa;
+      --tl-time: #71717a;
+      --notif-bg: #1c1c1c;
+      --notif-border: #27272a;
+      --notif-shadow: 0 6px 24px rgba(0,0,0,0.4);
+      --notif-accent-bg: #1e1b4b;
+      --notif-accent: #818cf8;
+      --notif-title: #e4e4e7;
+      --notif-message: #a1a1aa;
+      --notif-close: #71717a;
+      --notif-close-hover: #e4e4e7;
       --drawer-bg: #141414;
       --drawer-border: #27272a;
       --drawer-title: #fafafa;
