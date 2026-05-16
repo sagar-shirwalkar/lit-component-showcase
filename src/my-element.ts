@@ -34,12 +34,41 @@ export class ShowcaseApp extends LitElement {
   @state() private inputValue = ''
   @state() private accordionOpen = new Set(['item-1'])
   @state() private drawerOpen = false
-  @state() private selectedDate?: number
+  @state() private selectedDate?: Date
   @state() private sliderValue = 50
+  @state() private brightnessValue = 70
+  @state() private rangeMin = 50
+  @state() private rangeMax = 350
+  @state() private otpValue = ''
+  @state() private pwValue = ''
+  @state() private badgeCount = 0
+  @state() private tagList = ['React', 'Lit', 'TypeScript', 'CSS', 'Vite']
+  @state() private selectedHour = 12
+  @state() private selectedMinute = 0
+  @state() private selectedTimezone = 'UTC'
   @state() private checkboxStates = new Map<string, boolean>()
   @state() private tablePage = 1
+  @state() private editableTablePage = 1
+  @state() private editableTableCols = ['ID', 'Name', 'Email', 'Role']
+  @state() private editableTableRows: Record<string, string>[] = [
+    { ID: '1', Name: 'Alice Johnson', Email: 'alice@test.com', Role: 'Admin' },
+    { ID: '2', Name: 'Bob Smith', Email: 'bob@test.com', Role: 'User' },
+    { ID: '3', Name: 'Charlie Brown', Email: 'charlie@test.com', Role: 'Editor' },
+    { ID: '4', Name: 'Diana Prince', Email: 'diana@test.com', Role: 'User' },
+    { ID: '5', Name: 'Edward King', Email: 'edward@test.com', Role: 'Admin' },
+  ]
+  @state() private newColName = ''
+  @state() private newRowInputs: Record<string, string> = {}
+  @state() private editingCell: string | null = null
+  @state() private hoveredCell: string | null = null
   @state() private paginationPage = 1
   @state() private tabsDemoActive = 'tab1'
+  @state() private tabsDemoTabs: { id: string; label: string; icon?: TemplateResult; closable?: boolean }[] = [
+    { id: 'tab1', label: 'Overview', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`, closable: false },
+    { id: 'tab2', label: 'Details', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, closable: true },
+    { id: 'tab3', label: 'Settings', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`, closable: true },
+  ]
+  @state() private _tabCounter = 4
   @state() private drawerEmailNotif = true
   @state() private drawerPushNotif = false
   @state() private drawerWeeklyDigest = false
@@ -90,7 +119,7 @@ export class ShowcaseApp extends LitElement {
       items: [
         { id: 'card', label: 'Card', desc: 'Content container with default, bordered, and elevated variants' },
         { id: 'badge', label: 'Badge', desc: 'Compact label for statuses, tags, and counts' },
-        { id: 'alert', label: 'Alert', desc: 'Contextual message with four severity levels' },
+        { id: 'status', label: 'Status', desc: 'Contextual message with four severity levels' },
         { id: 'notification', label: 'Notification', desc: 'Temporary toast that slides in from the top-right' },
       ],
     },
@@ -171,17 +200,26 @@ export class ShowcaseApp extends LitElement {
     return html`
       ${this.tile('Variants', html`
         <div class="demo-row">
-          <showcase-button variant="primary">Primary</showcase-button>
-          <showcase-button variant="secondary">Secondary</showcase-button>
-          <showcase-button variant="danger">Danger</showcase-button>
-          <showcase-button variant="ghost">Ghost</showcase-button>
+          <showcase-button variant="primary" tooltip="Primary action">Primary</showcase-button>
+          <showcase-button variant="secondary" tooltip="Secondary action">Secondary</showcase-button>
+          <showcase-button variant="danger" tooltip="Destructive action">Danger</showcase-button>
+          <showcase-button variant="ghost" tooltip="Minimal style">Ghost</showcase-button>
         </div>
       `)}
-      ${this.tile('Sizes', html`
+      ${this.tile('Floating Action Buttons', html`
         <div class="demo-row">
-          <showcase-button size="sm">Small</showcase-button>
-          <showcase-button size="md">Medium</showcase-button>
-          <showcase-button size="lg">Large</showcase-button>
+          <showcase-button circle variant="primary" tooltip="Add new item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </showcase-button>
+          <showcase-button circle variant="secondary" tooltip="Edit">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </showcase-button>
+          <showcase-button circle variant="danger" tooltip="Delete">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </showcase-button>
+          <showcase-button circle size="lg" variant="ghost" tooltip="Settings">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </showcase-button>
         </div>
       `)}
       ${this.tile('States', html`
@@ -189,6 +227,14 @@ export class ShowcaseApp extends LitElement {
           <showcase-button ?disabled=${true}>Disabled</showcase-button>
           <showcase-button ?loading=${true}>Loading</showcase-button>
         </div>
+      `)}
+      ${this.tile('Button Group', html`
+        <showcase-button-group .buttons=${[
+          { label: 'Day', variant: 'primary' as const },
+          { label: 'Week', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>` },
+          { label: 'Month' },
+          { label: 'Year', disabled: true },
+        ]}></showcase-button-group>
       `)}
     `
   }
@@ -198,13 +244,47 @@ export class ShowcaseApp extends LitElement {
       ${this.tile('Variants', html`
         <div class="demo-grid">
           <showcase-card variant="default" title="Default Card">
-            <p>Subtle border and background for general content.</p>
+            <p style="margin:0 0 16px">Subtle border and background for general content.</p>
+            <div style="display:flex;gap:8px">
+              <showcase-button size="sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"/></svg>
+                Edit
+              </showcase-button>
+              <showcase-button size="sm" variant="outline">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                View
+              </showcase-button>
+            </div>
           </showcase-card>
           <showcase-card variant="bordered" title="Bordered Card">
-            <p>Prominent border accent for emphasis.</p>
+            <p style="margin:0 0 16px">Prominent border accent for emphasis.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <span style="padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#eef2ff;color:#6366f1">React</span>
+              <span style="padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#ecfdf5;color:#10b981">TypeScript</span>
+              <span style="padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;background:#fef3c7;color:#f59e0b">Lit</span>
+            </div>
+            <a href="#" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;font-size:13px;color:#6366f1;text-decoration:none">
+              Learn more
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
           </showcase-card>
           <showcase-card variant="elevated" title="Elevated Card" .hoverable=${true}>
-            <p>Drop shadow with lift animation on hover.</p>
+            <p style="margin:0 0 12px">Drop shadow with lift animation on hover.</p>
+            <div style="display:flex;gap:10px;margin-bottom:16px">
+              <showcase-button circle size="sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+              </showcase-button>
+              <showcase-button circle size="sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </showcase-button>
+              <showcase-button circle size="sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </showcase-button>
+            </div>
+            <showcase-button size="sm" style="width:100%">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              Send Feedback
+            </showcase-button>
           </showcase-card>
         </div>
       `)}
@@ -223,6 +303,15 @@ export class ShowcaseApp extends LitElement {
           ></showcase-input>
           <showcase-input label="Filled" variant="filled" placeholder="Filled style"></showcase-input>
           <showcase-input label="Outlined" variant="outlined" placeholder="Outlined style"></showcase-input>
+        </div>
+      `)}
+      ${this.tile('Password', html`
+        <showcase-input label="Password" type="password" placeholder="Enter password" .value=${this.pwValue} @input-change=${(e: CustomEvent) => this.pwValue = e.detail.value}></showcase-input>
+      `)}
+      ${this.tile('OTP Code', html`
+        <div class="demo-stack">
+          <showcase-otp .length=${6} .value=${this.otpValue} @otp-change=${(e: CustomEvent) => this.otpValue = e.detail.value}></showcase-otp>
+          ${this.otpValue.length === 6 ? html`<p style="font-size:13px;color:var(--text-2);margin:4px 0 0">Code entered: ${this.otpValue}</p>` : ''}
         </div>
       `)}
       ${this.tile('States', html`
@@ -327,13 +416,23 @@ export class ShowcaseApp extends LitElement {
     return html`
       ${this.tile('Interactive Demo', html`
         <showcase-tabs
+          .tabs=${this.tabsDemoTabs}
           .activeTab=${this.tabsDemoActive}
+          .addable=${true}
           @tab-change=${(e: CustomEvent) => this.tabsDemoActive = e.detail.tab}
-        >
-          <showcase-tab tab="tab1" label="Overview" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`}></showcase-tab>
-          <showcase-tab tab="tab2" label="Details" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`}></showcase-tab>
-          <showcase-tab tab="tab3" label="Settings" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`}></showcase-tab>
-        </showcase-tabs>
+          @tab-close=${(e: CustomEvent) => {
+            const id = e.detail.tab
+            this.tabsDemoTabs = this.tabsDemoTabs.filter(t => t.id !== id)
+            if (this.tabsDemoActive === id) {
+              this.tabsDemoActive = this.tabsDemoTabs[0]?.id ?? ''
+            }
+          }}
+          @tab-add=${() => {
+            const id = `tab${this._tabCounter++}`
+            this.tabsDemoTabs = [...this.tabsDemoTabs, { id, label: `Tab ${this._tabCounter - 1}`, closable: true }]
+            this.tabsDemoActive = id
+          }}
+        ></showcase-tabs>
         <div class="tab-content">
           ${this.tabsDemoActive === 'tab1' ? html`
             <div class="tab-demo-flex">
@@ -349,6 +448,9 @@ export class ShowcaseApp extends LitElement {
               <showcase-toggle label="Two-factor authentication" .checked=${true}></showcase-toggle>
             </div>
           ` : ''}
+          ${this.tabsDemoTabs.filter(t => !['tab1', 'tab2', 'tab3'].includes(t.id)).map(t =>
+            this.tabsDemoActive === t.id ? html`<p>Content for <strong>${t.label}</strong> — dynamically added tab.</p>` : ''
+          )}
         </div>
       `)}
     `
@@ -370,7 +472,7 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
-  private renderAlertDemo() {
+  private renderStatusDemo() {
     return html`
       ${this.tile('All Severity Levels', html`
         <div class="demo-stack">
@@ -402,12 +504,28 @@ export class ShowcaseApp extends LitElement {
           <showcase-badge color="danger">Danger</showcase-badge>
         </div>
       `)}
+      ${this.tile('Tags', html`
+        <div class="demo-row" style="flex-wrap:wrap">
+          ${this.tagList.map((tag, i) => html`
+            <showcase-badge type="tag" color="primary" .removable=${true} @remove=${() => this.tagList = this.tagList.filter((_, j) => j !== i)}>${tag}</showcase-badge>
+          `)}
+        </div>
+      `)}
+      ${this.tile('Count on Click', html`
+        <div style="display:flex;align-items:center;gap:12px">
+          <showcase-button @click=${() => this.badgeCount++} circle size="sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </showcase-button>
+          <showcase-badge color="primary">${this.badgeCount}</showcase-badge>
+          <span style="font-size:13px;color:var(--text-2)">click the + button</span>
+        </div>
+      `)}
     `
   }
 
   private renderDropdownDemo() {
     return html`
-      ${this.tile('Interactive Demo', html`
+      ${this.tile('Click Dropdown', html`
         <showcase-dropdown
           label="Options"
           .open=${this.dropdownOpen}
@@ -417,6 +535,18 @@ export class ShowcaseApp extends LitElement {
           <showcase-dropdown-item @click=${() => { this.dropdownOpen = false }}>Duplicate</showcase-dropdown-item>
           <showcase-dropdown-item @click=${() => { this.dropdownOpen = false }}>Archive</showcase-dropdown-item>
           <showcase-dropdown-item @click=${() => { this.dropdownOpen = false }}>Delete</showcase-dropdown-item>
+        </showcase-dropdown>
+      `)}
+      ${this.tile('Hover Dropdown', html`
+        <showcase-dropdown
+          label="Quick Actions"
+          trigger="hover"
+          icon="none"
+        >
+          <showcase-dropdown-item>View Profile</showcase-dropdown-item>
+          <showcase-dropdown-item>Settings</showcase-dropdown-item>
+          <showcase-dropdown-item>Help Center</showcase-dropdown-item>
+          <showcase-dropdown-item>Logout</showcase-dropdown-item>
         </showcase-dropdown>
       `)}
     `
@@ -456,22 +586,81 @@ export class ShowcaseApp extends LitElement {
   }
 
   private renderCalendarDemo() {
+    const timezones = ['UTC', 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'Europe/London', 'Europe/Paris', 'Europe/Berlin', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Kolkata', 'Australia/Sydney', 'Pacific/Auckland']
     return html`
       ${this.tile('Date Picker', html`
         <div class="demo-stack">
           <showcase-calendar
-            .value=${this.selectedDate}
-            @change=${(e: CustomEvent) => this.selectedDate = e.detail.date.getDate()}
+            .value=${this.selectedDate?.getDate()}
+            @change=${(e: CustomEvent) => this.selectedDate = e.detail.date}
           ></showcase-calendar>
           <p class="demo-note">
             ${this.selectedDate
-              ? `Selected: Day ${this.selectedDate} of the current month`
+              ? `Selected: ${this.selectedDate.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}`
               : 'Click a date to select it'
             }
           </p>
         </div>
       `)}
+      ${this.tile('Date & Time', html`
+        <div class="demo-stack">
+          <showcase-calendar
+            .value=${this.selectedDate?.getDate()}
+            @change=${(e: CustomEvent) => this.selectedDate = e.detail.date}
+          ></showcase-calendar>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:80px">
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:4px">Hour (24h)</label>
+              <input type="number" min="0" max="23"
+                .value=${String(this.selectedHour).padStart(2, '0')}
+                @input=${(e: InputEvent) => {
+                  const v = parseInt((e.target as HTMLInputElement).value)
+                  if (!isNaN(v) && v >= 0 && v <= 23) this.selectedHour = v
+                }}
+                style="width:100%;padding:10px 12px;border:1px solid var(--input-border,#d1d5db);border-radius:8px;font-size:14px;background:var(--input-bg,#fff);color:var(--input-text,#374151);box-sizing:border-box"
+              >
+            </div>
+            <div style="flex:1;min-width:80px">
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:4px">Minute</label>
+              <input type="number" min="0" max="59"
+                .value=${String(this.selectedMinute).padStart(2, '0')}
+                @input=${(e: InputEvent) => {
+                  const v = parseInt((e.target as HTMLInputElement).value)
+                  if (!isNaN(v) && v >= 0 && v <= 59) this.selectedMinute = v
+                }}
+                style="width:100%;padding:10px 12px;border:1px solid var(--input-border,#d1d5db);border-radius:8px;font-size:14px;background:var(--input-bg,#fff);color:var(--input-text,#374151);box-sizing:border-box"
+              >
+            </div>
+            <div style="flex:2;min-width:160px">
+              <label style="display:block;font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:4px">Timezone</label>
+              <select
+                .value=${this.selectedTimezone}
+                @change=${(e: Event) => this.selectedTimezone = (e.target as HTMLSelectElement).value}
+                style="width:100%;padding:10px 12px;border:1px solid var(--input-border,#d1d5db);border-radius:8px;font-size:14px;background:var(--input-bg,#fff);color:var(--input-text,#374151);box-sizing:border-box"
+              >
+                ${timezones.map(tz => html`
+                  <option value="${tz}" ?selected=${tz === this.selectedTimezone}>${tz.replace(/_/g, ' ').replace(/\//g, ' / ')}</option>
+                `)}
+              </select>
+            </div>
+          </div>
+          <p class="demo-note">
+            Selected:
+            ${this.selectedDate ? this.selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '--/--/----'}
+            ${String(this.selectedHour).padStart(2, '0')}:${String(this.selectedMinute).padStart(2, '0')}
+            ${this.selectedTimezone}
+          </p>
+        </div>
+      `)}
     `
+  }
+
+  private _addColumn() {
+    const name = this.newColName.trim()
+    if (!name || this.editableTableCols.includes(name)) return
+    this.editableTableCols = [...this.editableTableCols, name]
+    this.editableTableRows = this.editableTableRows.map(row => ({ ...row, [name]: '-' }))
+    this.newColName = ''
   }
 
   private renderDataTableDemo() {
@@ -501,21 +690,125 @@ export class ShowcaseApp extends LitElement {
           @page-change=${(e: CustomEvent) => this.tablePage = e.detail.page}
         ></showcase-data-table>
       `)}
+      ${this.tile('Editable Table', html`
+        <div class="editable-table-wrap">
+          <showcase-data-table
+            .columns=${this.editableTableCols.map(col => ({
+              key: col,
+              header: col,
+              render: (_: string, row: any) => {
+                const idx = this.editableTableRows.indexOf(row)
+                const cellKey = `${idx}-${col}`
+                const isEditing = this.editingCell === cellKey
+                const isHovered = this.hoveredCell === cellKey
+                if (isEditing) {
+                  return html`
+                    <span style="display:inline-flex;align-items:center;gap:4px;width:100%">
+                      <input
+                        .value=${row[col] || ''}
+                        @input=${(e: InputEvent) => {
+                          const v = (e.target as HTMLInputElement).value
+                          this.editableTableRows = this.editableTableRows.map((r, i) =>
+                            i === idx ? { ...r, [col]: v } : r
+                          )
+                        }}
+                        @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter') this.editingCell = null }}
+                        style="flex:1;min-width:0;padding:4px 6px;border:1px solid var(--table-accent,#6366f1);border-radius:4px;font-size:13px;background:var(--input-bg,#fff);color:var(--input-text,#374151);outline:none"
+                      >
+                      <span
+                        @click=${() => this.editingCell = null}
+                        style="display:flex;align-items:center;cursor:pointer;color:var(--table-accent,#6366f1);flex-shrink:0"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </span>
+                  `
+                }
+                return html`
+                  <span
+                    style="display:inline-flex;align-items:center;gap:4px;width:100%;cursor:pointer"
+                    @mouseenter=${() => this.hoveredCell = cellKey}
+                    @mouseleave=${() => { if (this.hoveredCell === cellKey) this.hoveredCell = null }}
+                    @click=${() => this.editingCell = cellKey}
+                  >
+                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${row[col] || ''}</span>
+                    <span style="display:flex;align-items:center;flex-shrink:0;color:var(--table-accent,#6366f1);${isHovered ? 'opacity:1' : 'opacity:0.25'};transition:opacity 0.15s">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </span>
+                  </span>
+                `
+              }
+            }))}
+            .data=${this.editableTableRows}
+            .pageSize=${5}
+            .currentPage=${this.editableTablePage}
+            @page-change=${(e: CustomEvent) => this.editableTablePage = e.detail.page}
+          ></showcase-data-table>
+          <div style="border-top:1px solid var(--border,#e5e7eb);padding-top:12px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px">Add Row</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              ${this.editableTableCols.filter(c => c !== 'ID').map(col => html`
+                <input
+                  placeholder="${col}"
+                  .value=${this.newRowInputs[col] || ''}
+                  @input=${(e: InputEvent) => {
+                    const val = (e.target as HTMLInputElement).value
+                    this.newRowInputs = { ...this.newRowInputs, [col]: val }
+                  }}
+                  style="flex:1;min-width:100px;padding:8px 10px;border:1px solid var(--input-border,#d1d5db);border-radius:6px;font-size:13px;background:var(--input-bg,#fff);color:var(--input-text,#374151)"
+                >
+              `)}
+              <showcase-button size="sm" @click=${() => {
+                const hasValue = Object.values(this.newRowInputs).some(v => v?.trim())
+                if (!hasValue) return
+                const nextId = String(Math.max(0, ...this.editableTableRows.map(r => parseInt(r.ID) || 0)) + 1)
+                this.editableTableRows = [...this.editableTableRows, { ID: nextId, ...this.newRowInputs }]
+                this.newRowInputs = {}
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+              </showcase-button>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--border,#e5e7eb);padding-top:12px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px">Add Column</div>
+            <div style="display:flex;gap:8px">
+              <input
+                placeholder="Column name"
+                .value=${this.newColName}
+                @input=${(e: InputEvent) => this.newColName = (e.target as HTMLInputElement).value}
+                @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter') this._addColumn() }}
+                style="flex:1;padding:8px 10px;border:1px solid var(--input-border,#d1d5db);border-radius:6px;font-size:13px;background:var(--input-bg,#fff);color:var(--input-text,#374151)"
+              >
+              <showcase-button size="sm" @click=${() => this._addColumn()}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+              </showcase-button>
+            </div>
+          </div>
+        </div>
+      `)}
     `
   }
 
   private renderNavbarDemo() {
     return html`
       ${this.tile('Navigation Bar', html`
-        <showcase-navbar
-          brand="MyApp"
-          .links=${[
-            { label: 'Home', href: '#' },
-            { label: 'About', href: '#' },
-            { label: 'Services', href: '#' },
-            { label: 'Contact', href: '#' },
-          ]}
-        ></showcase-navbar>
+        <div class="demo-stack">
+          <showcase-navbar
+            brand="MyApp"
+            .search=${true}
+            .links=${[
+              { label: 'Home', href: '#', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>` },
+              { label: 'Explore', href: '#', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>`, badge: 'New' },
+              { label: 'Docs', href: '#', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>` },
+            ]}
+            .actions=${[
+              { type: 'notification', badge: 'true' },
+              { type: 'avatar' },
+            ]}
+          ></showcase-navbar>
+        </div>
       `)}
     `
   }
@@ -537,6 +830,31 @@ export class ShowcaseApp extends LitElement {
           <showcase-checkbox label="Disabled (checked)" .checked=${true} disabled></showcase-checkbox>
         </div>
       `)}
+      ${this.tile('Checkbox Group', html`
+        <div style="display:flex;flex-wrap:wrap;gap:12px">
+          <div style="width:100%;font-size:13px;font-weight:600;color:var(--text-2)">Select your interests</div>
+          <showcase-checkbox
+            label="Technology"
+            .checked=${this.checkboxStates.get('tech') || false}
+            @change=${() => this.toggleCheckbox('tech')}
+          ></showcase-checkbox>
+          <showcase-checkbox
+            label="Design"
+            .checked=${this.checkboxStates.get('design') || false}
+            @change=${() => this.toggleCheckbox('design')}
+          ></showcase-checkbox>
+          <showcase-checkbox
+            label="Business"
+            .checked=${this.checkboxStates.get('business') || false}
+            @change=${() => this.toggleCheckbox('business')}
+          ></showcase-checkbox>
+          <showcase-checkbox
+            label="Science"
+            .checked=${this.checkboxStates.get('science') || false}
+            @change=${() => this.toggleCheckbox('science')}
+          ></showcase-checkbox>
+        </div>
+      `)}
     `
   }
 
@@ -552,12 +870,24 @@ export class ShowcaseApp extends LitElement {
             @change=${(e: CustomEvent) => this.sliderValue = e.detail.value}
           ></showcase-slider>
           <showcase-slider
+            label="Brightness"
+            .value=${this.brightnessValue}
+            .min=${0}
+            .max=${100}
+            .step=${10}
+            .icon=${html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`}
+            @change=${(e: CustomEvent) => this.brightnessValue = e.detail.value}
+          ></showcase-slider>
+          <showcase-range-slider
             label="Price Range"
-            .value=${75}
+            prefix="$"
             .min=${0}
             .max=${500}
-            .step=${25}
-          ></showcase-slider>
+            .step=${10}
+            .valueMin=${this.rangeMin}
+            .valueMax=${this.rangeMax}
+            @change=${(e: CustomEvent) => { this.rangeMin = e.detail.valueMin; this.rangeMax = e.detail.valueMax }}
+          ></showcase-range-slider>
         </div>
       `)}
     `
@@ -725,7 +1055,7 @@ export class ShowcaseApp extends LitElement {
       case 'modal': return this.renderModalDemo()
       case 'tabs': return this.renderTabsDemo()
       case 'toggle': return this.renderToggleDemo()
-      case 'alert': return this.renderAlertDemo()
+      case 'status': return this.renderStatusDemo()
       case 'badge': return this.renderBadgeDemo()
       case 'notification': return this.renderNotificationDemo()
       case 'dropdown': return this.renderDropdownDemo()
@@ -758,7 +1088,7 @@ export class ShowcaseApp extends LitElement {
             <button class="hamburger" @click=${() => this.sidebarOpen = !this.sidebarOpen} title="Toggle menu" aria-label="Toggle navigation menu">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <div class="nav-logo"></div>
+            <svg xmlns="http://www.w3.org/2000/svg" class="nav-logo" width="20" height="25" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 320"><path fill="#00E8FF" d="m64 192l25.926-44.727l38.233-19.114l63.974 63.974l10.833 61.754L192 320l-64-64l-38.074-25.615z"></path><path fill="#283198" d="M128 256V128l64-64v128l-64 64ZM0 256l64 64l9.202-60.602L64 192l-37.542 23.71L0 256Z"></path><path fill="#324FFF" d="M64 192V64l64-64v128l-64 64Zm128 128V192l64-64v128l-64 64ZM0 256V128l64 64l-64 64Z"></path><path fill="#0FF" d="M64 320V192l64 64z"></path></svg>
             <span class="nav-brand">Lit UI Kit</span>
             <span class="nav-tag">Component Library</span>
           </div>
@@ -840,6 +1170,9 @@ export class ShowcaseApp extends LitElement {
       --navbar-accent: #6366f1;
       --navbar-link:  #64748b;
       --navbar-hover: #f1f5f9;
+      --navbar-text: #1f2937;
+      --navbar-search-bg: #f1f5f9;
+      --navbar-search-border: transparent;
       --pagination-bg: #ffffff;
       --pagination-border: #e5e7eb;
       --pagination-text: #374151;
@@ -857,6 +1190,12 @@ export class ShowcaseApp extends LitElement {
       --btn-danger-text: #ffffff;
       --btn-ghost-text: #6366f1;
       --btn-ghost-hover: #eef2ff;
+      --btn-tooltip-bg: #1f2937;
+      --btn-tooltip-text: #ffffff;
+      --btn-group-bg: #ffffff;
+      --btn-group-text: #374151;
+      --btn-group-border: #d1d5db;
+      --btn-group-hover-bg: #f3f4f6;
       --card-bg: #f9fafb;
       --card-bg-accent: #ffffff;
       --card-border: #e5e7eb;
@@ -912,6 +1251,7 @@ export class ShowcaseApp extends LitElement {
       --badge-warning-text: #d97706;
       --badge-danger-bg: #fef2f2;
       --badge-danger-text: #dc2626;
+      --badge-tag-border: #e5e7eb;
       --dropdown-trigger-bg: #ffffff;
       --dropdown-trigger-border: #d1d5db;
       --dropdown-trigger-text: #374151;
@@ -956,6 +1296,7 @@ export class ShowcaseApp extends LitElement {
       --slider-value: #6366f1;
       --slider-track: #e5e7eb;
       --slider-thumb: #6366f1;
+      --slider-thumb-border: #ffffff;
       --upload-border: #d1d5db;
       --upload-bg: #fafafa;
       --upload-accent: #6366f1;
@@ -1048,6 +1389,9 @@ export class ShowcaseApp extends LitElement {
       --navbar-accent: #818cf8;
       --navbar-link:  #a1a1aa;
       --navbar-hover: #1c1c1c;
+      --navbar-text: #e4e4e7;
+      --navbar-search-bg: #27272a;
+      --navbar-search-border: transparent;
       --pagination-bg: #1c1c1c;
       --pagination-border: #27272a;
       --pagination-text: #d4d4d8;
@@ -1065,6 +1409,12 @@ export class ShowcaseApp extends LitElement {
       --btn-danger-text: #ffffff;
       --btn-ghost-text: #818cf8;
       --btn-ghost-hover: #1e1b4b;
+      --btn-tooltip-bg: #fafafa;
+      --btn-tooltip-text: #1f2937;
+      --btn-group-bg: #1c1c1c;
+      --btn-group-text: #e4e4e7;
+      --btn-group-border: #3f3f46;
+      --btn-group-hover-bg: #27272a;
       --card-bg: #141414;
       --card-bg-accent: #1c1c1c;
       --card-border: #27272a;
@@ -1120,6 +1470,7 @@ export class ShowcaseApp extends LitElement {
       --badge-warning-text: #f59e0b;
       --badge-danger-bg: #450a0a;
       --badge-danger-text: #ef4444;
+      --badge-tag-border: #3f3f46;
       --dropdown-trigger-bg: #1c1c1c;
       --dropdown-trigger-border: #3f3f46;
       --dropdown-trigger-text: #d4d4d8;
@@ -1164,6 +1515,7 @@ export class ShowcaseApp extends LitElement {
       --slider-value: #818cf8;
       --slider-track: #3f3f46;
       --slider-thumb: #818cf8;
+      --slider-thumb-border: #1c1c1c;
       --upload-border: #3f3f46;
       --upload-bg: #141414;
       --upload-accent: #818cf8;
@@ -1263,11 +1615,11 @@ export class ShowcaseApp extends LitElement {
     }
 
     .nav-logo {
-      width: 22px;
-      height: 22px;
-      background: var(--accent);
-      border-radius: 4px;
+      width: 20px;
+      height: 25px;
       flex-shrink: 0;
+      display: flex;
+      align-items: center;
     }
 
     .nav-brand {
@@ -1338,6 +1690,12 @@ export class ShowcaseApp extends LitElement {
 
     .sidebar-group {
       margin-bottom: 4px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-group:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
     }
 
     .sidebar-category {
@@ -1480,6 +1838,11 @@ export class ShowcaseApp extends LitElement {
       flex-direction: column;
       gap: 14px;
       max-width: 400px;
+    }
+
+    .editable-table-wrap {
+      width: 100%;
+      min-width: 0;
     }
 
     .demo-note {
@@ -1696,6 +2059,10 @@ export class ShowcaseApp extends LitElement {
       .nav-tag { display: none; }
       .nav-stat { display: none; }
 
+      .body {
+        min-height: 0;
+      }
+
       .sidebar {
         position: fixed;
         top: 52px;
@@ -1717,7 +2084,9 @@ export class ShowcaseApp extends LitElement {
       }
 
       .content {
-        padding: 24px 16px 40px;
+        padding: 24px 16px 80px;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
       }
 
       .content-title {
@@ -1739,7 +2108,8 @@ export class ShowcaseApp extends LitElement {
 
     @media (max-width: 600px) {
       .content {
-        padding: 16px 12px 36px;
+        padding: 16px 12px 60px;
+        overflow-y: visible;
       }
 
       .content-title {
