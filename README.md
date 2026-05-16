@@ -1,6 +1,8 @@
 # Lit UI Kit — Component Showcase
 
-A professional, interactive component library built with **Lit 3**, **TypeScript**, and **Vite**. The showcase features a Metro-inspired dashboard UI with a persistent sidebar, dark/light mode, and live demos of 17 fully self-contained web components.
+A professional, interactive component library built with **Lit 3**, **TypeScript**, and **Vite**. The showcase features a Metro-inspired dashboard UI with a persistent sidebar, dark/light mode, and live demos of 22 fully self-contained web components.
+
+[View the kit here](https://lit-component-showcase.pages.dev)
 
 ---
 
@@ -46,11 +48,13 @@ Key features of the dashboard shell:
 
 | Category | Components |
 |---|---|
-| Form Controls | Button, Input, Checkbox, Toggle, Slider |
-| Display | Card, Badge, Alert |
-| Navigation | Tabs, Navbar, Accordion, Pagination, Dropdown |
+| Category | Components |
+|---|---|---|
+| Form Controls | Button, Input, Checkbox, Toggle, Slider, Upload |
+| Display | Card, Badge, Alert, Notification |
+| Navigation | Tabs, Navbar, Accordion, Pagination, Dropdown, Sidebar |
 | Overlay | Modal, Drawer |
-| Data | Data Table, Calendar |
+| Data | Data Table, Calendar, Transfer, Timeline |
 
 ---
 
@@ -179,10 +183,15 @@ lit-component-showcase/
 │   │   ├── input.ts
 │   │   ├── modal.ts
 │   │   ├── navbar.ts
+│   │   ├── notification.ts
 │   │   ├── pagination.ts
+│   │   ├── sidebar.ts
 │   │   ├── slider.ts
 │   │   ├── tabs.ts
-│   │   └── toggle.ts
+│   │   ├── timeline.ts
+│   │   ├── toggle.ts
+│   │   ├── transfer.ts
+│   │   └── upload.ts
 │   ├── index.css            # Global base styles and Tailwind imports
 │   └── my-element.ts        # Root showcase-app shell (navbar, sidebar, demos)
 ├── index.html               # HTML entry point
