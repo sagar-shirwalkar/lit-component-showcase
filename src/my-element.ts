@@ -40,6 +40,12 @@ export class ShowcaseApp extends LitElement {
   @state() private tablePage = 1
   @state() private paginationPage = 1
   @state() private tabsDemoActive = 'tab1'
+  @state() private tabsDemoTabs: { id: string; label: string; icon?: TemplateResult; closable?: boolean }[] = [
+    { id: 'tab1', label: 'Overview', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`, closable: false },
+    { id: 'tab2', label: 'Details', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, closable: true },
+    { id: 'tab3', label: 'Settings', icon: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`, closable: true },
+  ]
+  @state() private _tabCounter = 4
   @state() private drawerEmailNotif = true
   @state() private drawerPushNotif = false
   @state() private drawerWeeklyDigest = false
@@ -327,13 +333,23 @@ export class ShowcaseApp extends LitElement {
     return html`
       ${this.tile('Interactive Demo', html`
         <showcase-tabs
+          .tabs=${this.tabsDemoTabs}
           .activeTab=${this.tabsDemoActive}
+          .addable=${true}
           @tab-change=${(e: CustomEvent) => this.tabsDemoActive = e.detail.tab}
-        >
-          <showcase-tab tab="tab1" label="Overview" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`}></showcase-tab>
-          <showcase-tab tab="tab2" label="Details" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`}></showcase-tab>
-          <showcase-tab tab="tab3" label="Settings" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`}></showcase-tab>
-        </showcase-tabs>
+          @tab-close=${(e: CustomEvent) => {
+            const id = e.detail.tab
+            this.tabsDemoTabs = this.tabsDemoTabs.filter(t => t.id !== id)
+            if (this.tabsDemoActive === id) {
+              this.tabsDemoActive = this.tabsDemoTabs[0]?.id ?? ''
+            }
+          }}
+          @tab-add=${() => {
+            const id = `tab${this._tabCounter++}`
+            this.tabsDemoTabs = [...this.tabsDemoTabs, { id, label: `Tab ${this._tabCounter - 1}`, closable: true }]
+            this.tabsDemoActive = id
+          }}
+        ></showcase-tabs>
         <div class="tab-content">
           ${this.tabsDemoActive === 'tab1' ? html`
             <div class="tab-demo-flex">
@@ -349,6 +365,9 @@ export class ShowcaseApp extends LitElement {
               <showcase-toggle label="Two-factor authentication" .checked=${true}></showcase-toggle>
             </div>
           ` : ''}
+          ${this.tabsDemoTabs.filter(t => !['tab1', 'tab2', 'tab3'].includes(t.id)).map(t =>
+            this.tabsDemoActive === t.id ? html`<p>Content for <strong>${t.label}</strong> — dynamically added tab.</p>` : ''
+          )}
         </div>
       `)}
     `
@@ -758,7 +777,9 @@ export class ShowcaseApp extends LitElement {
             <button class="hamburger" @click=${() => this.sidebarOpen = !this.sidebarOpen} title="Toggle menu" aria-label="Toggle navigation menu">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <div class="nav-logo"></div>
+            <svg class="nav-logo" width="22" height="22" viewBox="0 0 32 32" fill="none">
+              <path d="M6 4h8v16h12v8H6V4z" fill="currentColor"/>
+            </svg>
             <span class="nav-brand">Lit UI Kit</span>
             <span class="nav-tag">Component Library</span>
           </div>
@@ -1265,8 +1286,7 @@ export class ShowcaseApp extends LitElement {
     .nav-logo {
       width: 22px;
       height: 22px;
-      background: var(--accent);
-      border-radius: 4px;
+      color: var(--accent);
       flex-shrink: 0;
     }
 
@@ -1338,6 +1358,12 @@ export class ShowcaseApp extends LitElement {
 
     .sidebar-group {
       margin-bottom: 4px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-group:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
     }
 
     .sidebar-category {
@@ -1696,6 +1722,10 @@ export class ShowcaseApp extends LitElement {
       .nav-tag { display: none; }
       .nav-stat { display: none; }
 
+      .body {
+        min-height: 0;
+      }
+
       .sidebar {
         position: fixed;
         top: 52px;
@@ -1717,7 +1747,9 @@ export class ShowcaseApp extends LitElement {
       }
 
       .content {
-        padding: 24px 16px 40px;
+        padding: 24px 16px 80px;
+        overflow-y: visible;
+        -webkit-overflow-scrolling: touch;
       }
 
       .content-title {
@@ -1739,7 +1771,8 @@ export class ShowcaseApp extends LitElement {
 
     @media (max-width: 600px) {
       .content {
-        padding: 16px 12px 36px;
+        padding: 16px 12px 60px;
+        overflow-y: visible;
       }
 
       .content-title {
