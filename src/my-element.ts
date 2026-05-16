@@ -32,6 +32,11 @@ export class ShowcaseApp extends LitElement {
   @state() private checkboxStates = new Map<string, boolean>()
   @state() private tablePage = 1
   @state() private paginationPage = 1
+  @state() private darkMode = false
+  @state() private drawerEmailNotif = true
+  @state() private drawerPushNotif = false
+  @state() private drawerWeeklyDigest = false
+  @state() private drawerAutoUpdate = true
 
   private tabs = [
     { id: 'button', label: 'Button' },
@@ -418,21 +423,66 @@ export class ShowcaseApp extends LitElement {
     return html`
       <div class="demo-section">
         <h2>Right Drawer</h2>
-        <showcase-button @click=${() => this.drawerOpen = true}>Open Drawer</showcase-button>
-        
-        <showcase-drawer 
+        <showcase-button @click=${() => this.drawerOpen = true}>Open Settings</showcase-button>
+
+        <showcase-drawer
           ?open=${this.drawerOpen}
-          title="Settings"
+          title="User Settings"
           @close=${() => this.drawerOpen = false}
         >
-          <div class="drawer-content">
-            <p>This is the drawer content. It slides in from the right side.</p>
-            <br>
-            <showcase-checkbox label="Enable notifications"></showcase-checkbox>
-            <br>
-            <showcase-checkbox label="Dark mode"></showcase-checkbox>
-            <br>
-            <showcase-checkbox label="Auto-update"></showcase-checkbox>
+          <div class="drawer-section">
+            <div class="drawer-profile">
+              <div class="drawer-avatar">AS</div>
+              <div class="drawer-profile-info">
+                <div class="drawer-profile-name">Alex Smith</div>
+                <showcase-badge color="primary">Pro Plan</showcase-badge>
+              </div>
+            </div>
+          </div>
+
+          <div class="drawer-divider"></div>
+
+          <div class="drawer-section">
+            <div class="drawer-section-title">Account</div>
+            <showcase-input label="Display Name" value="Alex Smith" variant="outlined"></showcase-input>
+            <showcase-input label="Email" value="alex@example.com" variant="outlined"></showcase-input>
+          </div>
+
+          <div class="drawer-divider"></div>
+
+          <div class="drawer-section">
+            <div class="drawer-section-title">Notifications</div>
+            <showcase-toggle
+              label="Email notifications"
+              .checked=${this.drawerEmailNotif}
+              @toggle=${(e: CustomEvent) => this.drawerEmailNotif = e.detail.checked}
+            ></showcase-toggle>
+            <showcase-toggle
+              label="Push notifications"
+              .checked=${this.drawerPushNotif}
+              @toggle=${(e: CustomEvent) => this.drawerPushNotif = e.detail.checked}
+            ></showcase-toggle>
+          </div>
+
+          <div class="drawer-divider"></div>
+
+          <div class="drawer-section">
+            <div class="drawer-section-title">Preferences</div>
+            <showcase-checkbox
+              label="Weekly digest emails"
+              .checked=${this.drawerWeeklyDigest}
+              @change=${() => this.drawerWeeklyDigest = !this.drawerWeeklyDigest}
+            ></showcase-checkbox>
+            <showcase-checkbox
+              label="Auto-update application"
+              .checked=${this.drawerAutoUpdate}
+              @change=${() => this.drawerAutoUpdate = !this.drawerAutoUpdate}
+            ></showcase-checkbox>
+          </div>
+
+          <div class="drawer-footer">
+            <showcase-button variant="ghost" @click=${() => this.drawerOpen = false}>Cancel</showcase-button>
+            <showcase-button variant="primary">Save Changes</showcase-button>
           </div>
         </showcase-drawer>
       </div>
@@ -481,10 +531,17 @@ export class ShowcaseApp extends LitElement {
 
   render() {
     return html`
-      <div class="app">
+      <div class="app ${this.darkMode ? 'dark' : ''}">
         <header class="header">
           <h1>Lit Component Showcase</h1>
           <p>A collection of interactive UI components built with Lit & TypeScript</p>
+          <div class="header-controls">
+            <showcase-toggle
+              label="Dark mode"
+              .checked=${this.darkMode}
+              @toggle=${(e: CustomEvent) => this.darkMode = e.detail.checked}
+            ></showcase-toggle>
+          </div>
         </header>
         
         <nav class="nav">
@@ -633,6 +690,76 @@ export class ShowcaseApp extends LitElement {
       font-weight: 600;
       background: #eef2ff;
       color: #6366f1;
+    }
+    .header-controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    /* Dark mode overrides for the app shell */
+    .app.dark { background: #0f172a; }
+    .app.dark .header h1 { color: #f1f5f9; }
+    .app.dark .header p { color: #94a3b8; }
+    .app.dark .nav { background: #1e293b; }
+    .app.dark .nav-btn { color: #94a3b8; }
+    .app.dark .nav-btn:hover { background: #334155; color: #f1f5f9; }
+    .app.dark .nav-btn.active { background: #0f172a; color: #818cf8; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+    .app.dark .main { background: #1e293b; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    .app.dark .footer { color: #94a3b8; border-color: #334155; }
+    .app.dark .demo-section h2 { color: #f1f5f9; border-color: #334155; }
+    .app.dark .tab-content { background: #0f172a; }
+    /* Drawer content styles */
+    .drawer-section {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .drawer-profile {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .drawer-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .drawer-profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .drawer-profile-name {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 15px;
+    }
+    .drawer-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #94a3b8;
+    }
+    .drawer-divider {
+      height: 1px;
+      background: #e5e7eb;
+      margin: 4px 0;
+    }
+    .drawer-footer {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding-top: 8px;
+      margin-top: 8px;
     }
   `
 }
