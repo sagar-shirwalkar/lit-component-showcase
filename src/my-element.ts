@@ -22,6 +22,7 @@ import './components/sidebar.ts'
 import './components/upload.ts'
 import './components/transfer.ts'
 import './components/timeline.ts'
+import './components/notification.ts'
 
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
@@ -64,6 +65,7 @@ export class ShowcaseApp extends LitElement {
     { id: 't5', title: 'Testing & QA', description: 'Integration testing, bug fixes, and performance tuning.', completed: false },
     { id: 't6', title: 'Deployment', description: 'Production release and monitoring setup.', completed: false },
   ]
+  @state() private showNotification = false
   @state() private signupName = ''
   @state() private signupEmail = ''
   @state() private signupPassword = ''
@@ -89,6 +91,7 @@ export class ShowcaseApp extends LitElement {
         { id: 'card', label: 'Card', desc: 'Content container with default, bordered, and elevated variants' },
         { id: 'badge', label: 'Badge', desc: 'Compact label for statuses, tags, and counts' },
         { id: 'alert', label: 'Alert', desc: 'Contextual message with four severity levels' },
+        { id: 'notification', label: 'Notification', desc: 'Temporary toast that slides in from the top-right' },
       ],
     },
     {
@@ -700,6 +703,20 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
+  private renderNotificationDemo() {
+    return html`
+      ${this.tile('Trigger Notification', html`
+        <showcase-button @click=${() => this.showNotification = true}>Show Notification</showcase-button>
+        <showcase-notification
+          .open=${this.showNotification}
+          title="Update Available"
+          message="Version 2.4.1 is ready to install. Restart the app to apply the latest changes."
+          @close=${() => this.showNotification = false}
+        ></showcase-notification>
+      `)}
+    `
+  }
+
   private renderContent() {
     switch (this.activeTab) {
       case 'button': return this.renderButtonDemo()
@@ -710,6 +727,7 @@ export class ShowcaseApp extends LitElement {
       case 'toggle': return this.renderToggleDemo()
       case 'alert': return this.renderAlertDemo()
       case 'badge': return this.renderBadgeDemo()
+      case 'notification': return this.renderNotificationDemo()
       case 'dropdown': return this.renderDropdownDemo()
       case 'accordion': return this.renderAccordionDemo()
       case 'calendar': return this.renderCalendarDemo()
@@ -977,6 +995,15 @@ export class ShowcaseApp extends LitElement {
       --tl-desc: #6b7280;
       --tl-date: #64748b;
       --tl-time: #94a3b8;
+      --notif-bg: #ffffff;
+      --notif-border: #e5e7eb;
+      --notif-shadow: 0 6px 24px rgba(0,0,0,0.12);
+      --notif-accent-bg: #eef2ff;
+      --notif-accent: #6366f1;
+      --notif-title: #1f2937;
+      --notif-message: #6b7280;
+      --notif-close: #9ca3af;
+      --notif-close-hover: #374151;
       --drawer-bg: #ffffff;
       --drawer-border: #e5e7eb;
       --drawer-title: #1e293b;
@@ -1176,6 +1203,15 @@ export class ShowcaseApp extends LitElement {
       --tl-desc: #a1a1aa;
       --tl-date: #a1a1aa;
       --tl-time: #71717a;
+      --notif-bg: #1c1c1c;
+      --notif-border: #27272a;
+      --notif-shadow: 0 6px 24px rgba(0,0,0,0.4);
+      --notif-accent-bg: #1e1b4b;
+      --notif-accent: #818cf8;
+      --notif-title: #e4e4e7;
+      --notif-message: #a1a1aa;
+      --notif-close: #71717a;
+      --notif-close-hover: #e4e4e7;
       --drawer-bg: #141414;
       --drawer-border: #27272a;
       --drawer-title: #fafafa;

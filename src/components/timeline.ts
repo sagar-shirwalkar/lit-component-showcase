@@ -135,18 +135,12 @@ export class ShowcaseTimeline extends LitElement {
       color: var(--tl-title-done, #16a34a);
     }
 
-    .item.mobile-date .date-col {
-      display: none;
-    }
     .mobile-date-row {
       display: none;
     }
 
     @media (max-width: 640px) {
       .date-col {
-        display: none !important;
-      }
-      .item.mobile-date .date-col {
         display: none !important;
       }
       .mobile-date-row {
@@ -185,7 +179,7 @@ export class ShowcaseTimeline extends LitElement {
     return html`
       <div class="timeline">
         ${this.items.map(item => html`
-          <div class="item ${item.date || item.time ? 'mobile-date' : ''}">
+          <div class="item">
             <div class="date-col">
               ${item.completed && item.date ? html`<span class="date-text">${this._formatDate(item.date)}</span>` : ''}
               ${item.completed && item.time ? html`<span class="time-text">${item.time}</span>` : ''}
