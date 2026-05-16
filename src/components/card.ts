@@ -19,29 +19,29 @@ export class ShowcaseCard extends LitElement {
       transition: all 0.2s;
     }
     .default {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
+      background: var(--card-bg, #f9fafb);
+      border: 1px solid var(--card-border, #e5e7eb);
     }
     .bordered {
-      background: white;
-      border: 2px solid #6366f1;
+      background: var(--card-bg-accent, #ffffff);
+      border: 2px solid var(--card-accent, #6366f1);
     }
     .elevated {
-      background: white;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+      background: var(--card-bg-accent, #ffffff);
+      box-shadow: var(--card-shadow, 0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1));
     }
     .hoverable:hover {
       transform: translateY(-2px);
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+      box-shadow: var(--card-shadow-hover, 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1));
     }
     .title {
       font-size: 18px;
       font-weight: 600;
       margin: 0 0 12px;
-      color: #111827;
+      color: var(--card-title, #111827);
     }
     ::slotted(*) {
-      color: #4b5563;
+      color: var(--card-body, #4b5563);
     }
   `
 

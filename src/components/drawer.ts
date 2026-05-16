@@ -23,8 +23,8 @@ export class ShowcaseDrawer extends LitElement {
       right: 0;
       bottom: 0;
       width: 320px;
-      background: white;
-      box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+      background: var(--drawer-bg, #ffffff);
+      box-shadow: var(--drawer-shadow, -4px 0 24px rgba(0,0,0,0.15));
       z-index: 1001;
       animation: slideIn 0.3s ease-out;
       display: flex;
@@ -35,20 +35,20 @@ export class ShowcaseDrawer extends LitElement {
       justify-content: space-between;
       align-items: center;
       padding: 20px 24px;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--drawer-border, #e5e7eb);
     }
     .header h2 {
       margin: 0;
       font-size: 18px;
       font-weight: 600;
-      color: #1e293b;
+      color: var(--drawer-title, #1e293b);
     }
     .close-btn {
       background: none;
       border: none;
       font-size: 24px;
       cursor: pointer;
-      color: #64748b;
+      color: var(--drawer-close, #64748b);
       padding: 0;
       width: 32px;
       height: 32px;
@@ -58,7 +58,7 @@ export class ShowcaseDrawer extends LitElement {
       border-radius: 6px;
     }
     .close-btn:hover {
-      background: #f1f5f9;
+      background: var(--drawer-close-hover, #f1f5f9);
     }
     .content {
       flex: 1;
@@ -66,7 +66,7 @@ export class ShowcaseDrawer extends LitElement {
       overflow-y: auto;
     }
     ::slotted(*) {
-      color: #475569;
+      color: var(--drawer-body, #475569);
     }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }

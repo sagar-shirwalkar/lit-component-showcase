@@ -22,24 +22,24 @@ export class ShowcaseBadge extends LitElement {
       letter-spacing: 0.5px;
     }
     .default {
-      background: #f3f4f6;
-      color: #4b5563;
+      background: var(--badge-default-bg, #f3f4f6);
+      color: var(--badge-default-text, #4b5563);
     }
     .primary {
-      background: #eef2ff;
-      color: #6366f1;
+      background: var(--badge-primary-bg, #eef2ff);
+      color: var(--badge-primary-text, #6366f1);
     }
     .success {
-      background: #f0fdf4;
-      color: #16a34a;
+      background: var(--badge-success-bg, #f0fdf4);
+      color: var(--badge-success-text, #16a34a);
     }
     .warning {
-      background: #fffbeb;
-      color: #d97706;
+      background: var(--badge-warning-bg, #fffbeb);
+      color: var(--badge-warning-text, #d97706);
     }
     .danger {
-      background: #fef2f2;
-      color: #dc2626;
+      background: var(--badge-danger-bg, #fef2f2);
+      color: var(--badge-danger-text, #dc2626);
     }
   `
 

@@ -21,14 +21,14 @@ export class ShowcaseModal extends LitElement {
       animation: fadeIn 0.2s;
     }
     .modal {
-      background: white;
+      background: var(--modal-bg, #ffffff);
       border-radius: 12px;
       padding: 24px;
       max-width: 500px;
       width: 90%;
       max-height: 80vh;
       overflow: auto;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+      box-shadow: var(--modal-shadow, 0 20px 25px -5px rgba(0,0,0,0.1));
       animation: slideUp 0.2s;
     }
     .header {
@@ -40,14 +40,14 @@ export class ShowcaseModal extends LitElement {
     .header h2 {
       margin: 0;
       font-size: 20px;
-      color: #1e293b;
+      color: var(--modal-title, #1e293b);
     }
     .close-btn {
       background: none;
       border: none;
       font-size: 24px;
       cursor: pointer;
-      color: #64748b;
+      color: var(--modal-close, #64748b);
       padding: 0;
       width: 32px;
       height: 32px;
@@ -57,10 +57,10 @@ export class ShowcaseModal extends LitElement {
       border-radius: 6px;
     }
     .close-btn:hover {
-      background: #f1f5f9;
+      background: var(--modal-close-hover, #f1f5f9);
     }
     ::slotted(*) {
-      color: #475569;
+      color: var(--modal-body, #475569);
     }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

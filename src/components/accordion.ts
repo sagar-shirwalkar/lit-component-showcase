@@ -8,7 +8,7 @@ export class ShowcaseAccordion extends LitElement {
       display: block;
     }
     .accordion {
-      border: 1px solid #e5e7eb;
+      border: 1px solid var(--accordion-border, #e5e7eb);
       border-radius: 8px;
       overflow: hidden;
     }
@@ -32,7 +32,7 @@ export class ShowcaseAccordionItem extends LitElement {
   static styles = css`
     :host {
       display: block;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--accordion-border, #e5e7eb);
     }
     :host:last-child {
       border-bottom: none;
@@ -42,14 +42,14 @@ export class ShowcaseAccordionItem extends LitElement {
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
-      background: #f9fafb;
+      background: var(--accordion-header-bg, #f9fafb);
       cursor: pointer;
       font-weight: 500;
-      color: #374151;
+      color: var(--accordion-header-text, #374151);
       transition: background 0.2s;
     }
     .header:hover {
-      background: #f3f4f6;
+      background: var(--accordion-header-hover, #f3f4f6);
     }
     .icon {
       width: 20px;
@@ -70,7 +70,7 @@ export class ShowcaseAccordionItem extends LitElement {
       max-height: 500px;
     }
     ::slotted(*) {
-      color: #4b5563;
+      color: var(--accordion-body-text, #4b5563);
       margin: 0;
     }
   `

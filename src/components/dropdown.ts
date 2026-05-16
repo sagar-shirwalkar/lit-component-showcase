@@ -19,18 +19,18 @@ export class ShowcaseDropdown extends LitElement {
       align-items: center;
       gap: 8px;
       padding: 10px 16px;
-      background: white;
-      border: 1px solid #d1d5db;
+      background: var(--dropdown-trigger-bg, #ffffff);
+      border: 1px solid var(--dropdown-trigger-border, #d1d5db);
       border-radius: 8px;
       font-size: 14px;
       font-weight: 500;
-      color: #374151;
+      color: var(--dropdown-trigger-text, #374151);
       cursor: pointer;
       transition: all 0.2s;
     }
     .trigger:hover {
-      border-color: #6366f1;
-      background: #f5f3ff;
+      border-color: var(--dropdown-accent, #6366f1);
+      background: var(--dropdown-trigger-hover, #f5f3ff);
     }
     .trigger::after {
       content: '';
@@ -38,7 +38,7 @@ export class ShowcaseDropdown extends LitElement {
       height: 0;
       border-left: 5px solid transparent;
       border-right: 5px solid transparent;
-      border-top: 5px solid #6b7280;
+      border-top: 5px solid var(--dropdown-arrow, #6b7280);
       transition: transform 0.2s;
     }
     .trigger.open::after {
@@ -49,10 +49,10 @@ export class ShowcaseDropdown extends LitElement {
       top: calc(100% + 4px);
       left: 0;
       min-width: 180px;
-      background: white;
-      border: 1px solid #e5e7eb;
+      background: var(--dropdown-menu-bg, #ffffff);
+      border: 1px solid var(--dropdown-menu-border, #e5e7eb);
       border-radius: 8px;
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+      box-shadow: var(--dropdown-shadow, 0 10px 15px -3px rgba(0,0,0,0.1));
       z-index: 100;
       padding: 4px;
       animation: dropdownIn 0.15s ease-out;
@@ -114,7 +114,7 @@ export class ShowcaseDropdownItem extends LitElement {
       padding: 10px 12px;
       border: none;
       background: transparent;
-      color: #374151;
+      color: var(--dropdown-item-text, #374151);
       font-size: 14px;
       text-align: left;
       cursor: pointer;
@@ -122,7 +122,7 @@ export class ShowcaseDropdownItem extends LitElement {
       transition: background 0.15s;
     }
     .item:hover:not(:disabled) {
-      background: #f3f4f6;
+      background: var(--dropdown-item-hover, #f3f4f6);
     }
     .item:disabled {
       opacity: 0.5;

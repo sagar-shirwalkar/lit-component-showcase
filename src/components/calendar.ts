@@ -17,11 +17,11 @@ export class ShowcaseCalendar extends LitElement {
     }
     .calendar {
       width: 340px;
-      background: white;
-      border: 1px solid #e5e7eb;
+      background: var(--cal-bg, #ffffff);
+      border: 1px solid var(--cal-border, #e5e7eb);
       border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      box-shadow: var(--cal-shadow, 0 4px 6px -1px rgba(0,0,0,0.1));
     }
     .header {
       display: flex;
@@ -39,12 +39,12 @@ export class ShowcaseCalendar extends LitElement {
       border: none;
       padding: 4px 8px;
       cursor: pointer;
-      color: #64748b;
+      color: var(--cal-nav-color, #64748b);
       border-radius: 4px;
       flex-shrink: 0;
     }
     .nav-btn:hover {
-      background: #f1f5f9;
+      background: var(--cal-nav-hover, #f1f5f9);
     }
     .weekdays {
       display: grid;
@@ -56,7 +56,7 @@ export class ShowcaseCalendar extends LitElement {
       text-align: center;
       font-size: 12px;
       font-weight: 600;
-      color: #64748b;
+      color: var(--cal-weekday, #64748b);
       padding: 8px 0;
     }
     .days {
@@ -74,22 +74,22 @@ export class ShowcaseCalendar extends LitElement {
       border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
-      color: #374151;
+      color: var(--cal-day-text, #374151);
       transition: all 0.15s;
     }
     .day:hover:not(:disabled) {
-      background: #f1f5f9;
+      background: var(--cal-day-hover, #f1f5f9);
     }
     .day.today {
       font-weight: 600;
-      color: #6366f1;
+      color: var(--cal-today, #6366f1);
     }
     .day.selected {
-      background: #6366f1;
-      color: white;
+      background: var(--cal-selected-bg, #6366f1);
+      color: var(--cal-selected-text, #ffffff);
     }
     .day.other-month {
-      color: #d1d5db;
+      color: var(--cal-other-month, #d1d5db);
     }
     .day:disabled {
       cursor: default;
