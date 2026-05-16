@@ -5,6 +5,8 @@ import { customElement, property } from 'lit/decorators.js'
 export class ShowcaseDropdown extends LitElement {
   @property({ type: String }) label = 'Options'
   @property({ type: Boolean }) open = false
+  @property({ type: String }) trigger: 'click' | 'hover' = 'click'
+  @property({ type: String }) icon: 'chevron' | 'dots' | 'none' = 'chevron'
 
   static styles = css`
     :host {
@@ -41,6 +43,16 @@ export class ShowcaseDropdown extends LitElement {
       border-top: 5px solid var(--dropdown-arrow, #6b7280);
       transition: transform 0.2s;
     }
+    .trigger.no-icon::after {
+      display: none;
+    }
+    .trigger.dots-icon {
+      gap: 2px;
+      padding: 8px;
+    }
+    .trigger.dots-icon::after {
+      display: none;
+    }
     .trigger.open::after {
       transform: rotate(180deg);
     }
@@ -66,14 +78,47 @@ export class ShowcaseDropdown extends LitElement {
     }
   `
 
+  private _timer: ReturnType<typeof setTimeout> | null = null
+
+  connectedCallback() {
+    super.connectedCallback()
+    if (this.trigger === 'hover') {
+      this.addEventListener('mouseenter', this._onMouseEnter)
+      this.addEventListener('mouseleave', this._onMouseLeave)
+    }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    this.removeEventListener('mouseenter', this._onMouseEnter)
+    this.removeEventListener('mouseleave', this._onMouseLeave)
+    if (this._timer) clearTimeout(this._timer)
+  }
+
+  private _onMouseEnter() {
+    if (this._timer) clearTimeout(this._timer)
+    this.open = true
+    this._emit()
+  }
+
+  private _onMouseLeave() {
+    if (this._timer) clearTimeout(this._timer)
+    this._timer = setTimeout(() => {
+      this.open = false
+      this._emit()
+    }, 150)
+  }
+
   render() {
     return html`
       <div class="dropdown">
         <button 
-          class="trigger ${this.open ? 'open' : ''}"
-          @click=${this._toggle}
+          class="trigger ${this.open ? 'open' : ''} ${this.icon === 'none' ? 'no-icon' : ''} ${this.icon === 'dots' ? 'dots-icon' : ''}"
+          @click=${this.trigger === 'click' ? this._toggle : undefined}
         >
-          ${this.label}
+          ${this.icon === 'dots' ? html`
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+          ` : this.label}
         </button>
         ${this.open ? html`
           <div class="menu" @click=${this._stopPropagation}>
@@ -86,6 +131,10 @@ export class ShowcaseDropdown extends LitElement {
 
   private _toggle() {
     this.open = !this.open
+    this._emit()
+  }
+
+  private _emit() {
     this.dispatchEvent(new CustomEvent('toggle', { 
       detail: { open: this.open },
       bubbles: true, 
