@@ -13,6 +13,7 @@ export class ShowcaseButton extends LitElement {
   @property({ type: Boolean }) loading = false
   @property({ type: Boolean }) circle = false
   @property({ type: String }) tooltip = ''
+  private _tooltipTimer: ReturnType<typeof setTimeout> | null = null
 
   static styles = css`
     :host {
@@ -77,10 +78,23 @@ export class ShowcaseButton extends LitElement {
       transition: opacity 0.15s;
       z-index: 50;
     }
-    :host(:hover) .tooltip {
+    :host(:hover) .tooltip, :host(.tooltip-active) .tooltip {
       opacity: 1;
     }
   `
+
+  private _onTouchStart() {
+    if (!this.tooltip) return
+    if (this._tooltipTimer) clearTimeout(this._tooltipTimer)
+    this.classList.add('tooltip-active')
+  }
+
+  private _onTouchEnd() {
+    if (!this.tooltip) return
+    this._tooltipTimer = setTimeout(() => {
+      this.classList.remove('tooltip-active')
+    }, 1500)
+  }
 
   render() {
     return html`
@@ -88,6 +102,8 @@ export class ShowcaseButton extends LitElement {
         class="${this.size} ${this.variant}${this.circle ? ' circle' : ''}"
         ?disabled=${this.disabled || this.loading}
         @click=${this._onClick}
+        @touchstart=${this._onTouchStart}
+        @touchend=${this._onTouchEnd}
       >
         ${this.loading ? html`<span class="spinner"></span>` : ''}
         <slot></slot>

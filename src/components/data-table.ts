@@ -1,10 +1,11 @@
 import { LitElement, html, css } from 'lit'
+import type { TemplateResult } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 
 export interface ColumnDef {
   key: string
   header: string
-  render?: (value: any, row: any) => string
+  render?: (value: any, row: any) => string | TemplateResult
 }
 
 @customElement('showcase-data-table')

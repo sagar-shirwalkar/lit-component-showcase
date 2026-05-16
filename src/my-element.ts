@@ -34,7 +34,7 @@ export class ShowcaseApp extends LitElement {
   @state() private inputValue = ''
   @state() private accordionOpen = new Set(['item-1'])
   @state() private drawerOpen = false
-  @state() private selectedDate?: number
+  @state() private selectedDate?: Date
   @state() private sliderValue = 50
   @state() private brightnessValue = 70
   @state() private rangeMin = 50
@@ -48,6 +48,19 @@ export class ShowcaseApp extends LitElement {
   @state() private selectedTimezone = 'UTC'
   @state() private checkboxStates = new Map<string, boolean>()
   @state() private tablePage = 1
+  @state() private editableTablePage = 1
+  @state() private editableTableCols = ['ID', 'Name', 'Email', 'Role']
+  @state() private editableTableRows: Record<string, string>[] = [
+    { ID: '1', Name: 'Alice Johnson', Email: 'alice@test.com', Role: 'Admin' },
+    { ID: '2', Name: 'Bob Smith', Email: 'bob@test.com', Role: 'User' },
+    { ID: '3', Name: 'Charlie Brown', Email: 'charlie@test.com', Role: 'Editor' },
+    { ID: '4', Name: 'Diana Prince', Email: 'diana@test.com', Role: 'User' },
+    { ID: '5', Name: 'Edward King', Email: 'edward@test.com', Role: 'Admin' },
+  ]
+  @state() private newColName = ''
+  @state() private newRowInputs: Record<string, string> = {}
+  @state() private editingCell: string | null = null
+  @state() private hoveredCell: string | null = null
   @state() private paginationPage = 1
   @state() private tabsDemoActive = 'tab1'
   @state() private tabsDemoTabs: { id: string; label: string; icon?: TemplateResult; closable?: boolean }[] = [
@@ -578,12 +591,12 @@ export class ShowcaseApp extends LitElement {
       ${this.tile('Date Picker', html`
         <div class="demo-stack">
           <showcase-calendar
-            .value=${this.selectedDate}
-            @change=${(e: CustomEvent) => this.selectedDate = e.detail.date.getDate()}
+            .value=${this.selectedDate?.getDate()}
+            @change=${(e: CustomEvent) => this.selectedDate = e.detail.date}
           ></showcase-calendar>
           <p class="demo-note">
             ${this.selectedDate
-              ? `Selected: Day ${this.selectedDate} of the current month`
+              ? `Selected: ${this.selectedDate.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}`
               : 'Click a date to select it'
             }
           </p>
@@ -592,8 +605,8 @@ export class ShowcaseApp extends LitElement {
       ${this.tile('Date & Time', html`
         <div class="demo-stack">
           <showcase-calendar
-            .value=${this.selectedDate}
-            @change=${(e: CustomEvent) => this.selectedDate = e.detail.date.getDate()}
+            .value=${this.selectedDate?.getDate()}
+            @change=${(e: CustomEvent) => this.selectedDate = e.detail.date}
           ></showcase-calendar>
           <div style="display:flex;gap:12px;flex-wrap:wrap">
             <div style="flex:1;min-width:80px">
@@ -633,13 +646,21 @@ export class ShowcaseApp extends LitElement {
           </div>
           <p class="demo-note">
             Selected:
-            ${this.selectedDate ? `${this.selectedDate.toString().padStart(2, '0')}/${(new Date().getMonth() + 1).toString().padStart(2, '0')}/${new Date().getFullYear()}` : '--/--/----'}
+            ${this.selectedDate ? this.selectedDate.toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }) : '--/--/----'}
             ${String(this.selectedHour).padStart(2, '0')}:${String(this.selectedMinute).padStart(2, '0')}
             ${this.selectedTimezone}
           </p>
         </div>
       `)}
     `
+  }
+
+  private _addColumn() {
+    const name = this.newColName.trim()
+    if (!name || this.editableTableCols.includes(name)) return
+    this.editableTableCols = [...this.editableTableCols, name]
+    this.editableTableRows = this.editableTableRows.map(row => ({ ...row, [name]: '-' }))
+    this.newColName = ''
   }
 
   private renderDataTableDemo() {
@@ -668,6 +689,104 @@ export class ShowcaseApp extends LitElement {
           .currentPage=${this.tablePage}
           @page-change=${(e: CustomEvent) => this.tablePage = e.detail.page}
         ></showcase-data-table>
+      `)}
+      ${this.tile('Editable Table', html`
+        <div class="editable-table-wrap">
+          <showcase-data-table
+            .columns=${this.editableTableCols.map(col => ({
+              key: col,
+              header: col,
+              render: (_: string, row: any) => {
+                const idx = this.editableTableRows.indexOf(row)
+                const cellKey = `${idx}-${col}`
+                const isEditing = this.editingCell === cellKey
+                const isHovered = this.hoveredCell === cellKey
+                if (isEditing) {
+                  return html`
+                    <span style="display:inline-flex;align-items:center;gap:4px;width:100%">
+                      <input
+                        .value=${row[col] || ''}
+                        @input=${(e: InputEvent) => {
+                          const v = (e.target as HTMLInputElement).value
+                          this.editableTableRows = this.editableTableRows.map((r, i) =>
+                            i === idx ? { ...r, [col]: v } : r
+                          )
+                        }}
+                        @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter') this.editingCell = null }}
+                        style="flex:1;min-width:0;padding:4px 6px;border:1px solid var(--table-accent,#6366f1);border-radius:4px;font-size:13px;background:var(--input-bg,#fff);color:var(--input-text,#374151);outline:none"
+                      >
+                      <span
+                        @click=${() => this.editingCell = null}
+                        style="display:flex;align-items:center;cursor:pointer;color:var(--table-accent,#6366f1);flex-shrink:0"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
+                    </span>
+                  `
+                }
+                return html`
+                  <span
+                    style="display:inline-flex;align-items:center;gap:4px;width:100%;cursor:pointer"
+                    @mouseenter=${() => this.hoveredCell = cellKey}
+                    @mouseleave=${() => { if (this.hoveredCell === cellKey) this.hoveredCell = null }}
+                    @click=${() => this.editingCell = cellKey}
+                  >
+                    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${row[col] || ''}</span>
+                    <span style="display:flex;align-items:center;flex-shrink:0;color:var(--table-accent,#6366f1);${isHovered ? 'opacity:1' : 'opacity:0.25'};transition:opacity 0.15s">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </span>
+                  </span>
+                `
+              }
+            }))}
+            .data=${this.editableTableRows}
+            .pageSize=${5}
+            .currentPage=${this.editableTablePage}
+            @page-change=${(e: CustomEvent) => this.editableTablePage = e.detail.page}
+          ></showcase-data-table>
+          <div style="border-top:1px solid var(--border,#e5e7eb);padding-top:12px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px">Add Row</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              ${this.editableTableCols.filter(c => c !== 'ID').map(col => html`
+                <input
+                  placeholder="${col}"
+                  .value=${this.newRowInputs[col] || ''}
+                  @input=${(e: InputEvent) => {
+                    const val = (e.target as HTMLInputElement).value
+                    this.newRowInputs = { ...this.newRowInputs, [col]: val }
+                  }}
+                  style="flex:1;min-width:100px;padding:8px 10px;border:1px solid var(--input-border,#d1d5db);border-radius:6px;font-size:13px;background:var(--input-bg,#fff);color:var(--input-text,#374151)"
+                >
+              `)}
+              <showcase-button size="sm" @click=${() => {
+                const hasValue = Object.values(this.newRowInputs).some(v => v?.trim())
+                if (!hasValue) return
+                const nextId = String(Math.max(0, ...this.editableTableRows.map(r => parseInt(r.ID) || 0)) + 1)
+                this.editableTableRows = [...this.editableTableRows, { ID: nextId, ...this.newRowInputs }]
+                this.newRowInputs = {}
+              }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+              </showcase-button>
+            </div>
+          </div>
+          <div style="border-top:1px solid var(--border,#e5e7eb);padding-top:12px">
+            <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px">Add Column</div>
+            <div style="display:flex;gap:8px">
+              <input
+                placeholder="Column name"
+                .value=${this.newColName}
+                @input=${(e: InputEvent) => this.newColName = (e.target as HTMLInputElement).value}
+                @keydown=${(e: KeyboardEvent) => { if (e.key === 'Enter') this._addColumn() }}
+                style="flex:1;padding:8px 10px;border:1px solid var(--input-border,#d1d5db);border-radius:6px;font-size:13px;background:var(--input-bg,#fff);color:var(--input-text,#374151)"
+              >
+              <showcase-button size="sm" @click=${() => this._addColumn()}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add
+              </showcase-button>
+            </div>
+          </div>
+        </div>
       `)}
     `
   }
@@ -1719,6 +1838,11 @@ export class ShowcaseApp extends LitElement {
       flex-direction: column;
       gap: 14px;
       max-width: 400px;
+    }
+
+    .editable-table-wrap {
+      width: 100%;
+      min-width: 0;
     }
 
     .demo-note {

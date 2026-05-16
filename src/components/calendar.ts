@@ -11,6 +11,21 @@ export class ShowcaseCalendar extends LitElement {
   @state() private monthDropdownOpen = false
   @state() private yearDropdownOpen = false
 
+  private _closeDropdowns = () => {
+    this.monthDropdownOpen = false
+    this.yearDropdownOpen = false
+  }
+
+  connectedCallback() {
+    super.connectedCallback()
+    document.addEventListener('click', this._closeDropdowns)
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback()
+    document.removeEventListener('click', this._closeDropdowns)
+  }
+
   static styles = css`
     :host {
       display: inline-block;
@@ -161,10 +176,10 @@ export class ShowcaseCalendar extends LitElement {
 
     const baseYear = today.getFullYear()
     const yearRange: number[] = []
-    for (let y = baseYear - 10; y <= baseYear + 10; y++) yearRange.push(y)
+    for (let y = 1990; y <= baseYear + 10; y++) yearRange.push(y)
 
     return html`
-      <div class="calendar">
+      <div class="calendar" @click=${(e: Event) => e.stopPropagation()}>
         <div class="header">
           <button class="nav-btn" @click=${this._prevMonth}>&larr;</button>
           <div class="header-selectors">
@@ -184,6 +199,7 @@ export class ShowcaseCalendar extends LitElement {
             </showcase-dropdown>
             <showcase-dropdown
               label="${this.year}"
+              menuMaxHeight="216px"
               .open=${this.yearDropdownOpen}
               @toggle=${(e: CustomEvent) => {
                 this.yearDropdownOpen = e.detail.open

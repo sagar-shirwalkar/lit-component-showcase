@@ -7,6 +7,7 @@ export class ShowcaseDropdown extends LitElement {
   @property({ type: Boolean }) open = false
   @property({ type: String }) trigger: 'click' | 'hover' = 'click'
   @property({ type: String }) icon: 'chevron' | 'dots' | 'none' = 'chevron'
+  @property({ type: String }) menuMaxHeight = ''
 
   static styles = css`
     :host {
@@ -121,7 +122,7 @@ export class ShowcaseDropdown extends LitElement {
           ` : this.label}
         </button>
         ${this.open ? html`
-          <div class="menu" @click=${this._stopPropagation}>
+          <div class="menu" style="${this.menuMaxHeight ? `max-height:${this.menuMaxHeight};overflow-y:auto` : ''}" @click=${this._stopPropagation}>
             <slot></slot>
           </div>
         ` : ''}
