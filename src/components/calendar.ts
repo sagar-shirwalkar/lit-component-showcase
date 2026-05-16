@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
+import './dropdown.ts'
 
 @customElement('showcase-calendar')
 export class ShowcaseCalendar extends LitElement {
@@ -7,13 +8,15 @@ export class ShowcaseCalendar extends LitElement {
   @property({ type: Number }) month = new Date().getMonth()
   @property({ type: Number }) year = new Date().getFullYear()
   @state() private selectedDate?: number
+  @state() private monthDropdownOpen = false
+  @state() private yearDropdownOpen = false
 
   static styles = css`
     :host {
       display: inline-block;
     }
     .calendar {
-      width: 320px;
+      width: 340px;
       background: white;
       border: 1px solid #e5e7eb;
       border-radius: 12px;
@@ -26,9 +29,10 @@ export class ShowcaseCalendar extends LitElement {
       align-items: center;
       margin-bottom: 16px;
     }
-    .month-year {
-      font-weight: 600;
-      color: #1e293b;
+    .header-selectors {
+      display: flex;
+      gap: 4px;
+      align-items: center;
     }
     .nav-btn {
       background: none;
@@ -37,6 +41,7 @@ export class ShowcaseCalendar extends LitElement {
       cursor: pointer;
       color: #64748b;
       border-radius: 4px;
+      flex-shrink: 0;
     }
     .nav-btn:hover {
       background: #f1f5f9;
@@ -103,10 +108,10 @@ export class ShowcaseCalendar extends LitElement {
   private _selectDay(day: number) {
     this.selectedDate = day
     this.value = day
-    this.dispatchEvent(new CustomEvent('change', { 
+    this.dispatchEvent(new CustomEvent('change', {
       detail: { date: new Date(this.year, this.month, day) },
-      bubbles: true, 
-      composed: true 
+      bubbles: true,
+      composed: true,
     }))
   }
 
@@ -128,6 +133,16 @@ export class ShowcaseCalendar extends LitElement {
     }
   }
 
+  private _selectMonth(month: number) {
+    this.month = month
+    this.monthDropdownOpen = false
+  }
+
+  private _selectYear(year: number) {
+    this.year = year
+    this.yearDropdownOpen = false
+  }
+
   render() {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December']
@@ -135,20 +150,53 @@ export class ShowcaseCalendar extends LitElement {
     const daysInMonth = this.getDaysInMonth(this.month, this.year)
     const firstDay = this.getFirstDayOfMonth(this.month, this.year)
     const today = new Date()
-    const isToday = (day: number) => 
-      day === today.getDate() && 
-      this.month === today.getMonth() && 
+    const isToday = (day: number) =>
+      day === today.getDate() &&
+      this.month === today.getMonth() &&
       this.year === today.getFullYear()
 
     const days: (number | null)[] = []
     for (let i = 0; i < firstDay; i++) days.push(null)
     for (let i = 1; i <= daysInMonth; i++) days.push(i)
 
+    const baseYear = today.getFullYear()
+    const yearRange: number[] = []
+    for (let y = baseYear - 10; y <= baseYear + 10; y++) yearRange.push(y)
+
     return html`
       <div class="calendar">
         <div class="header">
           <button class="nav-btn" @click=${this._prevMonth}>&larr;</button>
-          <span class="month-year">${monthNames[this.month]} ${this.year}</span>
+          <div class="header-selectors">
+            <showcase-dropdown
+              label="${monthNames[this.month]}"
+              .open=${this.monthDropdownOpen}
+              @toggle=${(e: CustomEvent) => {
+                this.monthDropdownOpen = e.detail.open
+                if (e.detail.open) this.yearDropdownOpen = false
+              }}
+            >
+              ${monthNames.map((name, i) => html`
+                <showcase-dropdown-item @click=${() => this._selectMonth(i)}>
+                  ${name}
+                </showcase-dropdown-item>
+              `)}
+            </showcase-dropdown>
+            <showcase-dropdown
+              label="${this.year}"
+              .open=${this.yearDropdownOpen}
+              @toggle=${(e: CustomEvent) => {
+                this.yearDropdownOpen = e.detail.open
+                if (e.detail.open) this.monthDropdownOpen = false
+              }}
+            >
+              ${yearRange.map(y => html`
+                <showcase-dropdown-item @click=${() => this._selectYear(y)}>
+                  ${y}
+                </showcase-dropdown-item>
+              `)}
+            </showcase-dropdown>
+          </div>
           <button class="nav-btn" @click=${this._nextMonth}>&rarr;</button>
         </div>
         <div class="weekdays">
@@ -156,9 +204,9 @@ export class ShowcaseCalendar extends LitElement {
         </div>
         <div class="days">
           ${days.map((day) => day === null
-            ? html`<div class="day other-month" disabled></div>`
+            ? html`<div class="day other-month"></div>`
             : html`
-              <button 
+              <button
                 class="day ${isToday(day) ? 'today' : ''} ${this.selectedDate === day ? 'selected' : ''}"
                 @click=${() => this._selectDay(day)}
               >
