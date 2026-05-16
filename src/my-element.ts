@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit'
+import type { TemplateResult } from 'lit'
 import { customElement, state } from 'lit/decorators.js'
 import './components/button.ts'
 import './components/card.ts'
@@ -21,6 +22,7 @@ import './components/pagination.ts'
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
   @state() private activeTab = 'button'
+  @state() private darkMode = false
   @state() private modalOpen = false
   @state() private toggleState = false
   @state() private dropdownOpen = false
@@ -32,39 +34,83 @@ export class ShowcaseApp extends LitElement {
   @state() private checkboxStates = new Map<string, boolean>()
   @state() private tablePage = 1
   @state() private paginationPage = 1
-  @state() private darkMode = false
+  @state() private tabsDemoActive = 'tab1'
   @state() private drawerEmailNotif = true
   @state() private drawerPushNotif = false
   @state() private drawerWeeklyDigest = false
   @state() private drawerAutoUpdate = true
 
-  private tabs = [
-    { id: 'button', label: 'Button' },
-    { id: 'card', label: 'Card' },
-    { id: 'input', label: 'Input' },
-    { id: 'modal', label: 'Modal' },
-    { id: 'tabs', label: 'Tabs' },
-    { id: 'toggle', label: 'Toggle' },
-    { id: 'alert', label: 'Alert' },
-    { id: 'badge', label: 'Badge' },
-    { id: 'dropdown', label: 'Dropdown' },
-    { id: 'accordion', label: 'Accordion' },
-    { id: 'calendar', label: 'Calendar' },
-    { id: 'data-table', label: 'Data Table' },
-    { id: 'navbar', label: 'Navbar' },
-    { id: 'checkbox', label: 'Checkbox' },
-    { id: 'slider', label: 'Slider' },
-    { id: 'drawer', label: 'Drawer' },
-    { id: 'pagination', label: 'Pagination' },
+  private componentGroups = [
+    {
+      category: 'Form Controls',
+      items: [
+        { id: 'button', label: 'Button', desc: 'Versatile button with variants, sizes, and states' },
+        { id: 'input', label: 'Input', desc: 'Text input with labels, validation, and multiple styles' },
+        { id: 'checkbox', label: 'Checkbox', desc: 'Checkbox with label and disabled state support' },
+        { id: 'toggle', label: 'Toggle', desc: 'Binary on/off switch for boolean settings' },
+        { id: 'slider', label: 'Slider', desc: 'Range input with configurable min, max, and step' },
+      ],
+    },
+    {
+      category: 'Display',
+      items: [
+        { id: 'card', label: 'Card', desc: 'Content container with default, bordered, and elevated variants' },
+        { id: 'badge', label: 'Badge', desc: 'Compact label for statuses, tags, and counts' },
+        { id: 'alert', label: 'Alert', desc: 'Contextual message with four severity levels' },
+      ],
+    },
+    {
+      category: 'Navigation',
+      items: [
+        { id: 'tabs', label: 'Tabs', desc: 'Horizontal tab group for switching content sections' },
+        { id: 'navbar', label: 'Navbar', desc: 'Top navigation bar with brand and links' },
+        { id: 'accordion', label: 'Accordion', desc: 'Collapsible content sections with animation' },
+        { id: 'pagination', label: 'Pagination', desc: 'Page controls with total count awareness' },
+        { id: 'dropdown', label: 'Dropdown', desc: 'Floating menu anchored to a trigger button' },
+      ],
+    },
+    {
+      category: 'Overlay',
+      items: [
+        { id: 'modal', label: 'Modal', desc: 'Focused dialog layered over content with a backdrop' },
+        { id: 'drawer', label: 'Drawer', desc: 'Side panel that slides in from the right edge' },
+      ],
+    },
+    {
+      category: 'Data',
+      items: [
+        { id: 'data-table', label: 'Data Table', desc: 'Tabular data display with built-in pagination' },
+        { id: 'calendar', label: 'Calendar', desc: 'Date picker with month and year dropdown navigation' },
+      ],
+    },
   ]
+
+  updated() {
+    if (this.darkMode) {
+      this.setAttribute('dark', '')
+      document.documentElement.style.background = '#0a0a0a'
+      document.body.style.background = '#0a0a0a'
+    } else {
+      this.removeAttribute('dark')
+      document.documentElement.style.background = '#f4f4f5'
+      document.body.style.background = '#f4f4f5'
+    }
+    document.body.style.margin = '0'
+    document.body.style.padding = '0'
+  }
+
+  private get currentComponent() {
+    for (const group of this.componentGroups) {
+      const item = group.items.find(i => i.id === this.activeTab)
+      if (item) return { ...item, category: group.category }
+    }
+    return null
+  }
 
   private toggleAccordion(id: string) {
     const newSet = new Set(this.accordionOpen)
-    if (newSet.has(id)) {
-      newSet.delete(id)
-    } else {
-      newSet.add(id)
-    }
+    if (newSet.has(id)) newSet.delete(id)
+    else newSet.add(id)
     this.accordionOpen = newSet
   }
 
@@ -74,96 +120,92 @@ export class ShowcaseApp extends LitElement {
     this.checkboxStates = newMap
   }
 
+  private tile(label: string, body: TemplateResult) {
+    return html`
+      <div class="demo-tile">
+        <div class="demo-tile-header"><span class="demo-tile-label">${label}</span></div>
+        <div class="demo-tile-body">${body}</div>
+      </div>
+    `
+  }
+
   private renderButtonDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Button Variants</h2>
+      ${this.tile('Variants', html`
         <div class="demo-row">
           <showcase-button variant="primary">Primary</showcase-button>
           <showcase-button variant="secondary">Secondary</showcase-button>
           <showcase-button variant="danger">Danger</showcase-button>
           <showcase-button variant="ghost">Ghost</showcase-button>
         </div>
-        
-        <h2>Button Sizes</h2>
+      `)}
+      ${this.tile('Sizes', html`
         <div class="demo-row">
           <showcase-button size="sm">Small</showcase-button>
           <showcase-button size="md">Medium</showcase-button>
           <showcase-button size="lg">Large</showcase-button>
         </div>
-        
-        <h2>States</h2>
+      `)}
+      ${this.tile('States', html`
         <div class="demo-row">
           <showcase-button ?disabled=${true}>Disabled</showcase-button>
           <showcase-button ?loading=${true}>Loading</showcase-button>
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderCardDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Card Variants</h2>
+      ${this.tile('Variants', html`
         <div class="demo-grid">
           <showcase-card variant="default" title="Default Card">
-            <p>This is a default card with a subtle border and background.</p>
+            <p>Subtle border and background for general content.</p>
           </showcase-card>
           <showcase-card variant="bordered" title="Bordered Card">
-            <p>This card has a prominent border accent.</p>
+            <p>Prominent border accent for emphasis.</p>
           </showcase-card>
           <showcase-card variant="elevated" title="Elevated Card" .hoverable=${true}>
-            <p>This card has a shadow effect and hover animation.</p>
+            <p>Drop shadow with lift animation on hover.</p>
           </showcase-card>
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderInputDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Input Variants</h2>
+      ${this.tile('Variants', html`
         <div class="demo-stack">
-          <showcase-input 
-            label="Default Input" 
+          <showcase-input
+            label="Default"
             placeholder="Enter text..."
             .value=${this.inputValue}
             @input-change=${(e: CustomEvent) => this.inputValue = e.detail.value}
           ></showcase-input>
-          <showcase-input 
-            label="Filled Input" 
-            variant="filled"
-            placeholder="Filled style"
-          ></showcase-input>
-          <showcase-input 
-            label="Outlined Input" 
-            variant="outlined"
-            placeholder="Outlined style"
-          ></showcase-input>
-          <showcase-input 
-            label="Error State" 
+          <showcase-input label="Filled" variant="filled" placeholder="Filled style"></showcase-input>
+          <showcase-input label="Outlined" variant="outlined" placeholder="Outlined style"></showcase-input>
+        </div>
+      `)}
+      ${this.tile('States', html`
+        <div class="demo-stack">
+          <showcase-input
+            label="Error"
             .error=${true}
             errorMessage="This field is required"
             placeholder="Invalid input"
           ></showcase-input>
-          <showcase-input 
-            label="Disabled Input" 
-            .disabled=${true}
-            value="Cannot edit"
-          ></showcase-input>
+          <showcase-input label="Disabled" .disabled=${true} value="Cannot edit"></showcase-input>
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderModalDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Modal Dialog</h2>
+      ${this.tile('Interactive Demo', html`
         <showcase-button @click=${() => this.modalOpen = true}>Open Modal</showcase-button>
-        
-        <showcase-modal 
+        <showcase-modal
           ?open=${this.modalOpen}
           title="Example Modal"
           @close=${() => this.modalOpen = false}
@@ -174,52 +216,49 @@ export class ShowcaseApp extends LitElement {
             <showcase-button @click=${() => this.modalOpen = false}>Confirm</showcase-button>
           </div>
         </showcase-modal>
-      </div>
+      `)}
     `
   }
 
   private renderTabsDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Tabs Component</h2>
-        <showcase-tabs .activeTab=${this.activeTab} @tab-change=${(e: CustomEvent) => this.activeTab = e.detail.tab}>
+      ${this.tile('Interactive Demo', html`
+        <showcase-tabs
+          .activeTab=${this.tabsDemoActive}
+          @tab-change=${(e: CustomEvent) => this.tabsDemoActive = e.detail.tab}
+        >
           <showcase-tab tab="tab1" label="Overview"></showcase-tab>
           <showcase-tab tab="tab2" label="Details"></showcase-tab>
           <showcase-tab tab="tab3" label="Settings"></showcase-tab>
         </showcase-tabs>
         <div class="tab-content">
-          ${this.activeTab === 'tab1' ? html`<p>Overview content goes here.</p>` : ''}
-          ${this.activeTab === 'tab2' ? html`<p>Details content goes here.</p>` : ''}
-          ${this.activeTab === 'tab3' ? html`<p>Settings content goes here.</p>` : ''}
+          ${this.tabsDemoActive === 'tab1' ? html`<p>Overview content goes here.</p>` : ''}
+          ${this.tabsDemoActive === 'tab2' ? html`<p>Details content goes here.</p>` : ''}
+          ${this.tabsDemoActive === 'tab3' ? html`<p>Settings content goes here.</p>` : ''}
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderToggleDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Toggle Switch</h2>
+      ${this.tile('Interactive Demo', html`
         <div class="demo-stack">
-          <showcase-toggle 
-            label="Enable notifications" 
+          <showcase-toggle
+            label="Enable notifications"
             .checked=${this.toggleState}
             @toggle=${(e: CustomEvent) => this.toggleState = e.detail.checked}
           ></showcase-toggle>
-          <showcase-toggle 
-            label="Dark mode" 
-            .checked=${true}
-            disabled
-          ></showcase-toggle>
+          <showcase-toggle label="Disabled (on)" .checked=${true} disabled></showcase-toggle>
+          <showcase-toggle label="Disabled (off)" disabled></showcase-toggle>
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderAlertDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Alert Messages</h2>
+      ${this.tile('All Severity Levels', html`
         <div class="demo-stack">
           <showcase-alert type="info" title="Information">
             This is an informational alert message.
@@ -234,14 +273,13 @@ export class ShowcaseApp extends LitElement {
             Something went wrong. Please try again.
           </showcase-alert>
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderBadgeDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Badges</h2>
+      ${this.tile('Color Variants', html`
         <div class="demo-row">
           <showcase-badge>Default</showcase-badge>
           <showcase-badge color="primary">Primary</showcase-badge>
@@ -249,34 +287,32 @@ export class ShowcaseApp extends LitElement {
           <showcase-badge color="warning">Warning</showcase-badge>
           <showcase-badge color="danger">Danger</showcase-badge>
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderDropdownDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Dropdown Menu</h2>
-        <showcase-dropdown 
+      ${this.tile('Interactive Demo', html`
+        <showcase-dropdown
           label="Options"
           .open=${this.dropdownOpen}
           @toggle=${(e: CustomEvent) => this.dropdownOpen = e.detail.open}
         >
-          <showcase-dropdown-item @click=${() => { this.dropdownOpen = false; console.log('Edit') }}>Edit</showcase-dropdown-item>
-          <showcase-dropdown-item @click=${() => { this.dropdownOpen = false; console.log('Duplicate') }}>Duplicate</showcase-dropdown-item>
-          <showcase-dropdown-item @click=${() => { this.dropdownOpen = false; console.log('Archive') }}>Archive</showcase-dropdown-item>
-          <showcase-dropdown-item @click=${() => { this.dropdownOpen = false; console.log('Delete') }}>Delete</showcase-dropdown-item>
+          <showcase-dropdown-item @click=${() => { this.dropdownOpen = false }}>Edit</showcase-dropdown-item>
+          <showcase-dropdown-item @click=${() => { this.dropdownOpen = false }}>Duplicate</showcase-dropdown-item>
+          <showcase-dropdown-item @click=${() => { this.dropdownOpen = false }}>Archive</showcase-dropdown-item>
+          <showcase-dropdown-item @click=${() => { this.dropdownOpen = false }}>Delete</showcase-dropdown-item>
         </showcase-dropdown>
-      </div>
+      `)}
     `
   }
 
   private renderAccordionDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Accordion</h2>
+      ${this.tile('Interactive Demo', html`
         <showcase-accordion>
-          <showcase-accordion-item 
+          <showcase-accordion-item
             id="item-1"
             title="What is Lit?"
             ?open=${this.accordionOpen.has('item-1')}
@@ -284,7 +320,7 @@ export class ShowcaseApp extends LitElement {
           >
             <p>Lit is a simple library for building fast, lightweight web components.</p>
           </showcase-accordion-item>
-          <showcase-accordion-item 
+          <showcase-accordion-item
             id="item-2"
             title="How do I get started?"
             ?open=${this.accordionOpen.has('item-2')}
@@ -292,7 +328,7 @@ export class ShowcaseApp extends LitElement {
           >
             <p>Install Lit via npm and start building your own web components today.</p>
           </showcase-accordion-item>
-          <showcase-accordion-item 
+          <showcase-accordion-item
             id="item-3"
             title="Is it production ready?"
             ?open=${this.accordionOpen.has('item-3')}
@@ -301,22 +337,26 @@ export class ShowcaseApp extends LitElement {
             <p>Yes! Lit is used by many companies in production applications.</p>
           </showcase-accordion-item>
         </showcase-accordion>
-      </div>
+      `)}
     `
   }
 
   private renderCalendarDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Date Picker Calendar</h2>
+      ${this.tile('Date Picker', html`
         <div class="demo-stack">
-          <showcase-calendar 
+          <showcase-calendar
             .value=${this.selectedDate}
             @change=${(e: CustomEvent) => this.selectedDate = e.detail.date.getDate()}
           ></showcase-calendar>
-          ${this.selectedDate ? html`<p>Selected: Day ${this.selectedDate} of the current month</p>` : html`<p>Click a date to select it</p>`}
+          <p class="demo-note">
+            ${this.selectedDate
+              ? `Selected: Day ${this.selectedDate} of the current month`
+              : 'Click a date to select it'
+            }
+          </p>
         </div>
-      </div>
+      `)}
     `
   }
 
@@ -327,7 +367,6 @@ export class ShowcaseApp extends LitElement {
       { key: 'email', header: 'Email' },
       { key: 'role', header: 'Role', render: (value: string) => html`<span class="role-badge">${value}</span>` },
     ]
-    
     const data = [
       { id: 1, name: 'Alice Johnson', email: 'alice@example.com', role: 'Admin' },
       { id: 2, name: 'Bob Smith', email: 'bob@example.com', role: 'User' },
@@ -338,26 +377,23 @@ export class ShowcaseApp extends LitElement {
       { id: 7, name: 'George Hill', email: 'george@example.com', role: 'User' },
       { id: 8, name: 'Hannah Lee', email: 'hannah@example.com', role: 'Editor' },
     ]
-
     return html`
-      <div class="demo-section">
-        <h2>Data Table</h2>
-        <showcase-data-table 
+      ${this.tile('Paginated Table', html`
+        <showcase-data-table
           .columns=${columns}
           .data=${data}
           .pageSize=${5}
           .currentPage=${this.tablePage}
           @page-change=${(e: CustomEvent) => this.tablePage = e.detail.page}
         ></showcase-data-table>
-      </div>
+      `)}
     `
   }
 
   private renderNavbarDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Navigation Bar</h2>
-        <showcase-navbar 
+      ${this.tile('Navigation Bar', html`
+        <showcase-navbar
           brand="MyApp"
           .links=${[
             { label: 'Home', href: '#' },
@@ -366,48 +402,42 @@ export class ShowcaseApp extends LitElement {
             { label: 'Contact', href: '#' },
           ]}
         ></showcase-navbar>
-      </div>
+      `)}
     `
   }
 
   private renderCheckboxDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Checkboxes</h2>
+      ${this.tile('Interactive Demo', html`
         <div class="demo-stack">
-          <showcase-checkbox 
+          <showcase-checkbox
             label="Accept terms and conditions"
             .checked=${this.checkboxStates.get('terms') || false}
             @change=${() => this.toggleCheckbox('terms')}
           ></showcase-checkbox>
-          <showcase-checkbox 
+          <showcase-checkbox
             label="Subscribe to newsletter"
             .checked=${this.checkboxStates.get('newsletter') || false}
             @change=${() => this.toggleCheckbox('newsletter')}
           ></showcase-checkbox>
-          <showcase-checkbox 
-            label="Disabled option"
-            .checked=${true}
-            disabled
-          ></showcase-checkbox>
+          <showcase-checkbox label="Disabled (checked)" .checked=${true} disabled></showcase-checkbox>
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderSliderDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Range Slider</h2>
+      ${this.tile('Interactive Demo', html`
         <div class="demo-stack">
-          <showcase-slider 
+          <showcase-slider
             label="Volume"
             .value=${this.sliderValue}
             .min=${0}
             .max=${100}
             @change=${(e: CustomEvent) => this.sliderValue = e.detail.value}
           ></showcase-slider>
-          <showcase-slider 
+          <showcase-slider
             label="Price Range"
             .value=${75}
             .min=${0}
@@ -415,14 +445,13 @@ export class ShowcaseApp extends LitElement {
             .step=${25}
           ></showcase-slider>
         </div>
-      </div>
+      `)}
     `
   }
 
   private renderDrawerDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Right Drawer</h2>
+      ${this.tile('Interactive Demo', html`
         <showcase-button @click=${() => this.drawerOpen = true}>Open Settings</showcase-button>
 
         <showcase-drawer
@@ -439,17 +468,13 @@ export class ShowcaseApp extends LitElement {
               </div>
             </div>
           </div>
-
           <div class="drawer-divider"></div>
-
           <div class="drawer-section">
             <div class="drawer-section-title">Account</div>
             <showcase-input label="Display Name" value="Alex Smith" variant="outlined"></showcase-input>
             <showcase-input label="Email" value="alex@example.com" variant="outlined"></showcase-input>
           </div>
-
           <div class="drawer-divider"></div>
-
           <div class="drawer-section">
             <div class="drawer-section-title">Notifications</div>
             <showcase-toggle
@@ -463,9 +488,7 @@ export class ShowcaseApp extends LitElement {
               @toggle=${(e: CustomEvent) => this.drawerPushNotif = e.detail.checked}
             ></showcase-toggle>
           </div>
-
           <div class="drawer-divider"></div>
-
           <div class="drawer-section">
             <div class="drawer-section-title">Preferences</div>
             <showcase-checkbox
@@ -479,30 +502,28 @@ export class ShowcaseApp extends LitElement {
               @change=${() => this.drawerAutoUpdate = !this.drawerAutoUpdate}
             ></showcase-checkbox>
           </div>
-
           <div class="drawer-footer">
             <showcase-button variant="ghost" @click=${() => this.drawerOpen = false}>Cancel</showcase-button>
             <showcase-button variant="primary">Save Changes</showcase-button>
           </div>
         </showcase-drawer>
-      </div>
+      `)}
     `
   }
 
   private renderPaginationDemo() {
     return html`
-      <div class="demo-section">
-        <h2>Pagination</h2>
+      ${this.tile('Interactive Demo', html`
         <div class="demo-stack">
-          <showcase-pagination 
+          <showcase-pagination
             .totalItems=${100}
             .pageSize=${10}
             .currentPage=${this.paginationPage}
             @page-change=${(e: CustomEvent) => this.paginationPage = e.detail.page}
           ></showcase-pagination>
-          <p>Current page: ${this.paginationPage}</p>
+          <p class="demo-note">Current page: ${this.paginationPage} of 10</p>
         </div>
-      </div>
+      `)}
     `
   }
 
@@ -530,195 +551,396 @@ export class ShowcaseApp extends LitElement {
   }
 
   render() {
+    const comp = this.currentComponent
+    const totalComponents = this.componentGroups.reduce((n, g) => n + g.items.length, 0)
+
     return html`
-      <div class="app ${this.darkMode ? 'dark' : ''}">
-        <header class="header">
-          <h1>Lit Component Showcase</h1>
-          <p>A collection of interactive UI components built with Lit & TypeScript</p>
-          <div class="header-controls">
-            <showcase-toggle
-              label="Dark mode"
-              .checked=${this.darkMode}
-              @toggle=${(e: CustomEvent) => this.darkMode = e.detail.checked}
-            ></showcase-toggle>
+      <div class="shell">
+
+        <!-- ── Top Navbar ── -->
+        <nav class="navbar">
+          <div class="nav-left">
+            <div class="nav-logo"></div>
+            <span class="nav-brand">Lit UI Kit</span>
+            <span class="nav-tag">Component Library</span>
           </div>
-        </header>
-        
-        <nav class="nav">
-          ${this.tabs.map(tab => html`
-            <button 
-              class="nav-btn ${this.activeTab === tab.id ? 'active' : ''}"
-              @click=${() => this.activeTab = tab.id}
+          <div class="nav-right">
+            <span class="nav-stat">${totalComponents} components</span>
+            <button
+              class="theme-btn"
+              @click=${() => this.darkMode = !this.darkMode}
+              title="${this.darkMode ? 'Switch to light mode' : 'Switch to dark mode'}"
             >
-              ${tab.label}
+              ${this.darkMode
+                ? html`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
+                : html`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+              }
             </button>
-          `)}
+          </div>
         </nav>
-        
-        <main class="main">
-          ${this.renderContent()}
-        </main>
-        
-        <footer class="footer">
-          <p>Built with Lit, TypeScript, and Tailwind CSS</p>
-        </footer>
+
+        <!-- ── Body: Sidebar + Content ── -->
+        <div class="body">
+
+          <aside class="sidebar">
+            ${this.componentGroups.map(group => html`
+              <div class="sidebar-group">
+                <div class="sidebar-category">${group.category}</div>
+                ${group.items.map(item => html`
+                  <button
+                    class="sidebar-item ${this.activeTab === item.id ? 'active' : ''}"
+                    @click=${() => this.activeTab = item.id}
+                  >
+                    <span class="sidebar-dot"></span>
+                    ${item.label}
+                  </button>
+                `)}
+              </div>
+            `)}
+          </aside>
+
+          <main class="content">
+            ${comp ? html`
+              <div class="content-header">
+                <div class="breadcrumb">${comp.category} / ${comp.label}</div>
+                <h1 class="content-title">${comp.label}</h1>
+                <p class="content-desc">${comp.desc}</p>
+              </div>
+            ` : ''}
+            <div class="demo-area">
+              ${this.renderContent()}
+            </div>
+          </main>
+
+        </div>
       </div>
     `
   }
 
   static styles = css`
+    /* ── Theme tokens ── */
     :host {
       display: block;
       min-height: 100vh;
-      background: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+      --bg:           #f4f4f5;
+      --surface:      #ffffff;
+      --surface-2:    #f8f8f9;
+      --text-1:       #09090b;
+      --text-2:       #52525b;
+      --text-3:       #a1a1aa;
+      --border:       #e4e4e7;
+      --accent:       #6366f1;
+      --accent-bg:    #eef2ff;
+      --accent-dim:   #c7d2fe;
+      --nav-bg:       #ffffff;
+      --sidebar-bg:   #fafafa;
+
+      background: var(--bg);
+      color: var(--text-1);
     }
-    .app {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 40px 20px;
+
+    :host([dark]) {
+      --bg:           #0a0a0a;
+      --surface:      #141414;
+      --surface-2:    #1c1c1c;
+      --text-1:       #fafafa;
+      --text-2:       #a1a1aa;
+      --text-3:       #52525b;
+      --border:       #27272a;
+      --accent:       #818cf8;
+      --accent-bg:    #1e1b4b;
+      --accent-dim:   #3730a3;
+      --nav-bg:       #0d0d0d;
+      --sidebar-bg:   #0d0d0d;
     }
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    .header h1 {
-      font-size: 36px;
-      font-weight: 700;
-      color: #1e293b;
-      margin: 0 0 12px;
-    }
-    .header p {
-      font-size: 18px;
-      color: #64748b;
-      margin: 0;
-    }
-    .nav {
+
+    /* ── Shell ── */
+    .shell {
       display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      justify-content: center;
-      margin-bottom: 40px;
-      padding: 8px;
-      background: #f1f5f9;
-      border-radius: 12px;
+      flex-direction: column;
+      min-height: 100vh;
     }
-    .nav-btn {
-      padding: 10px 20px;
-      border: none;
-      background: transparent;
-      color: #64748b;
-      font-size: 14px;
-      font-weight: 500;
+
+    /* ── Navbar ── */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      padding: 0 24px;
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-logo {
+      width: 22px;
+      height: 22px;
+      background: var(--accent);
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    .nav-brand {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-1);
+    }
+
+    .nav-tag {
+      font-size: 11px;
+      color: var(--text-3);
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-stat {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.2s;
+      color: var(--text-2);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
-    .nav-btn:hover {
-      background: #e2e8f0;
-      color: #1e293b;
+
+    .theme-btn:hover {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-color: var(--accent-dim);
     }
-    .nav-btn.active {
-      background: white;
-      color: #6366f1;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .main {
-      background: white;
-      border-radius: 12px;
-      padding: 32px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .demo-section {
-      margin-bottom: 40px;
-    }
-    .demo-section:last-child {
-      margin-bottom: 0;
-    }
-    .demo-section h2 {
-      font-size: 24px;
-      font-weight: 600;
-      color: #1e293b;
-      margin: 0 0 20px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-    .demo-row {
+
+    /* ── Body layout ── */
+    .body {
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      flex: 1;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 216px;
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      padding: 16px 0 40px;
+      height: calc(100vh - 52px);
+      position: sticky;
+      top: 52px;
+      overflow-y: auto;
+    }
+
+    .sidebar-group {
+      margin-bottom: 4px;
+    }
+
+    .sidebar-category {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-3);
+      padding: 12px 18px 4px;
+    }
+
+    .sidebar-item {
+      display: flex;
       align-items: center;
-      margin-bottom: 24px;
+      gap: 10px;
+      width: 100%;
+      padding: 7px 18px;
+      border: none;
+      border-left: 2px solid transparent;
+      background: transparent;
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.1s, color 0.1s, border-color 0.1s;
     }
-    .demo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
+
+    .sidebar-item:hover {
+      background: var(--surface);
+      color: var(--text-1);
     }
-    .demo-stack {
+
+    .sidebar-item.active {
+      background: var(--accent-bg);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .sidebar-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.35;
+      flex-shrink: 0;
+      transition: opacity 0.1s;
+    }
+
+    .sidebar-item.active .sidebar-dot {
+      opacity: 1;
+    }
+
+    /* ── Main content ── */
+    .content {
+      flex: 1;
+      padding: 36px 44px 60px;
+      min-width: 0;
+      overflow-y: auto;
+    }
+
+    .content-header {
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .breadcrumb {
+      font-size: 11.5px;
+      color: var(--text-3);
+      margin-bottom: 10px;
+      letter-spacing: 0.01em;
+    }
+
+    .content-title {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text-1);
+      margin: 0 0 8px;
+    }
+
+    .content-desc {
+      font-size: 14px;
+      color: var(--text-2);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* ── Demo tiles ── */
+    .demo-area {
       display: flex;
       flex-direction: column;
       gap: 16px;
+    }
+
+    .demo-tile {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: visible;
+    }
+
+    .demo-tile-header {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .demo-tile-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-3);
+    }
+
+    .demo-tile-body {
+      padding: 24px 20px;
+    }
+
+    /* ── Demo layout helpers ── */
+    .demo-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .demo-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
       max-width: 400px;
     }
-    .tab-content {
-      margin-top: 20px;
-      padding: 20px;
-      background: #f8fafc;
-      border-radius: 8px;
+
+    .demo-note {
+      font-size: 13px;
+      color: var(--text-3);
+      margin: 0;
     }
+
+    .tab-content {
+      margin-top: 14px;
+      padding: 16px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      color: var(--text-2);
+    }
+
+    .tab-content p { margin: 0; }
+
     .modal-actions {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       justify-content: flex-end;
-      margin-top: 24px;
-    }
-    .footer {
-      text-align: center;
-      margin-top: 40px;
-      padding-top: 24px;
-      border-top: 1px solid #e2e8f0;
-      color: #64748b;
-    }
-    .drawer-content {
-      color: #475569;
-    }
-    .role-badge {
-      display: inline-block;
-      padding: 4px 12px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
-      background: #eef2ff;
-      color: #6366f1;
-    }
-    .header-controls {
-      display: flex;
-      justify-content: center;
       margin-top: 20px;
     }
-    /* Dark mode overrides for the app shell */
-    .app.dark { background: #0f172a; }
-    .app.dark .header h1 { color: #f1f5f9; }
-    .app.dark .header p { color: #94a3b8; }
-    .app.dark .nav { background: #1e293b; }
-    .app.dark .nav-btn { color: #94a3b8; }
-    .app.dark .nav-btn:hover { background: #334155; color: #f1f5f9; }
-    .app.dark .nav-btn.active { background: #0f172a; color: #818cf8; box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
-    .app.dark .main { background: #1e293b; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-    .app.dark .footer { color: #94a3b8; border-color: #334155; }
-    .app.dark .demo-section h2 { color: #f1f5f9; border-color: #334155; }
-    .app.dark .tab-content { background: #0f172a; }
-    /* Drawer content styles */
+
+    /* ── Drawer content ── */
     .drawer-section {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
+
     .drawer-profile {
       display: flex;
       align-items: center;
       gap: 14px;
     }
+
     .drawer-avatar {
       width: 48px;
       height: 48px;
@@ -732,34 +954,50 @@ export class ShowcaseApp extends LitElement {
       font-size: 16px;
       flex-shrink: 0;
     }
+
     .drawer-profile-info {
       display: flex;
       flex-direction: column;
       gap: 6px;
     }
+
     .drawer-profile-name {
       font-weight: 600;
       color: #1e293b;
       font-size: 15px;
     }
+
     .drawer-section-title {
-      font-size: 11px;
+      font-size: 10.5px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.09em;
       color: #94a3b8;
     }
+
     .drawer-divider {
       height: 1px;
       background: #e5e7eb;
       margin: 4px 0;
     }
+
     .drawer-footer {
       display: flex;
       gap: 8px;
       justify-content: flex-end;
       padding-top: 8px;
       margin-top: 8px;
+    }
+
+    /* ── Misc ── */
+    .role-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #eef2ff;
+      color: #6366f1;
     }
   `
 }
