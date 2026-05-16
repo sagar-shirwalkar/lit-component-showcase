@@ -18,6 +18,7 @@ import './components/checkbox.ts'
 import './components/slider.ts'
 import './components/drawer.ts'
 import './components/pagination.ts'
+import './components/sidebar.ts'
 
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
@@ -40,6 +41,7 @@ export class ShowcaseApp extends LitElement {
   @state() private drawerWeeklyDigest = false
   @state() private drawerAutoUpdate = true
   @state() private sidebarOpen = false
+  @state() private sidebarDemoOpen = false
   @state() private signupName = ''
   @state() private signupEmail = ''
   @state() private signupPassword = ''
@@ -74,6 +76,7 @@ export class ShowcaseApp extends LitElement {
         { id: 'accordion', label: 'Accordion', desc: 'Collapsible content sections with animation' },
         { id: 'pagination', label: 'Pagination', desc: 'Page controls with total count awareness' },
         { id: 'dropdown', label: 'Dropdown', desc: 'Floating menu anchored to a trigger button' },
+        { id: 'sidebar', label: 'Sidebar', desc: 'Left-sliding panel with icon-driven navigation items' },
       ],
     },
     {
@@ -610,6 +613,26 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
+  private renderSidebarDemo() {
+    return html`
+      ${this.tile('Interactive Demo', html`
+        <showcase-button @click=${() => this.sidebarDemoOpen = true}>Open Sidebar</showcase-button>
+        <showcase-sidebar
+          ?open=${this.sidebarDemoOpen}
+          title="Navigation"
+          @close=${() => this.sidebarDemoOpen = false}
+        >
+          <showcase-sidebar-item label="Dashboard" .active=${true} .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>`}></showcase-sidebar-item>
+          <showcase-sidebar-item label="Inbox" badge="12" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>`}></showcase-sidebar-item>
+          <showcase-sidebar-item label="Analytics" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`}></showcase-sidebar-item>
+          <showcase-sidebar-item label="Settings" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`}></showcase-sidebar-item>
+          <div style="height:8px"></div>
+          <showcase-sidebar-item label="Help & Support" .icon=${html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`}></showcase-sidebar-item>
+        </showcase-sidebar>
+      `)}
+    `
+  }
+
   private renderContent() {
     switch (this.activeTab) {
       case 'button': return this.renderButtonDemo()
@@ -629,6 +652,7 @@ export class ShowcaseApp extends LitElement {
       case 'slider': return this.renderSliderDemo()
       case 'drawer': return this.renderDrawerDemo()
       case 'pagination': return this.renderPaginationDemo()
+      case 'sidebar': return this.renderSidebarDemo()
       default: return this.renderButtonDemo()
     }
   }
@@ -850,6 +874,21 @@ export class ShowcaseApp extends LitElement {
       --drawer-close: #64748b;
       --drawer-close-hover: #f1f5f9;
       --drawer-body: #475569;
+      --sidebar-bg: #ffffff;
+      --sidebar-shadow: 4px 0 24px rgba(0,0,0,0.15);
+      --sidebar-title: #1e293b;
+      --sidebar-close: #64748b;
+      --sidebar-close-hover: #f1f5f9;
+      --sidebar-divider: #e5e7eb;
+      --sidebar-item-text: #475569;
+      --sidebar-item-hover: #f1f5f9;
+      --sidebar-item-hover-text: #1e293b;
+      --sidebar-item-active-bg: #eef2ff;
+      --sidebar-item-active-text: #6366f1;
+      --sidebar-badge-bg: #e5e7eb;
+      --sidebar-badge-text: #4b5563;
+      --sidebar-badge-active-bg: #c7d2fe;
+      --sidebar-badge-active-text: #4338ca;
 
       background: var(--bg);
       color: var(--text-1);
@@ -995,6 +1034,21 @@ export class ShowcaseApp extends LitElement {
       --drawer-close: #a1a1aa;
       --drawer-close-hover: #27272a;
       --drawer-body: #a1a1aa;
+      --sidebar-bg: #141414;
+      --sidebar-shadow: 4px 0 24px rgba(0,0,0,0.4);
+      --sidebar-title: #fafafa;
+      --sidebar-close: #a1a1aa;
+      --sidebar-close-hover: #27272a;
+      --sidebar-divider: #27272a;
+      --sidebar-item-text: #a1a1aa;
+      --sidebar-item-hover: #1c1c1c;
+      --sidebar-item-hover-text: #fafafa;
+      --sidebar-item-active-bg: #1e1b4b;
+      --sidebar-item-active-text: #818cf8;
+      --sidebar-badge-bg: #27272a;
+      --sidebar-badge-text: #a1a1aa;
+      --sidebar-badge-active-bg: #3730a3;
+      --sidebar-badge-active-text: #c7d2fe;
     }
 
     /* ── Shell ── */
