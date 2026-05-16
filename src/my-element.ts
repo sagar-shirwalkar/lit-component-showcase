@@ -39,6 +39,7 @@ export class ShowcaseApp extends LitElement {
   @state() private drawerPushNotif = false
   @state() private drawerWeeklyDigest = false
   @state() private drawerAutoUpdate = true
+  @state() private sidebarOpen = false
 
   private componentGroups = [
     {
@@ -412,7 +413,7 @@ export class ShowcaseApp extends LitElement {
         <div class="demo-stack">
           <showcase-checkbox
             label="Accept terms and conditions"
-            .checked=${this.checkboxStates.get('terms') || false}
+            .checked=${this.checkboxStates.get('terms') || true}
             @change=${() => this.toggleCheckbox('terms')}
           ></showcase-checkbox>
           <showcase-checkbox
@@ -560,6 +561,9 @@ export class ShowcaseApp extends LitElement {
         <!-- ── Top Navbar ── -->
         <nav class="navbar">
           <div class="nav-left">
+            <button class="hamburger" @click=${() => this.sidebarOpen = !this.sidebarOpen} title="Toggle menu" aria-label="Toggle navigation menu">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
             <div class="nav-logo"></div>
             <span class="nav-brand">Lit UI Kit</span>
             <span class="nav-tag">Component Library</span>
@@ -582,14 +586,15 @@ export class ShowcaseApp extends LitElement {
         <!-- ── Body: Sidebar + Content ── -->
         <div class="body">
 
-          <aside class="sidebar">
-            ${this.componentGroups.map(group => html`
+          <div class="sidebar-overlay ${this.sidebarOpen ? 'visible' : ''}" @click=${() => this.sidebarOpen = false}></div>
+          <aside class="sidebar ${this.sidebarOpen ? 'open' : ''}">
+              ${this.componentGroups.map(group => html`
               <div class="sidebar-group">
                 <div class="sidebar-category">${group.category}</div>
                 ${group.items.map(item => html`
                   <button
                     class="sidebar-item ${this.activeTab === item.id ? 'active' : ''}"
-                    @click=${() => this.activeTab = item.id}
+                    @click=${() => { this.activeTab = item.id; this.sidebarOpen = false }}
                   >
                     <span class="sidebar-dot"></span>
                     ${item.label}
@@ -963,7 +968,7 @@ export class ShowcaseApp extends LitElement {
 
     .drawer-profile-name {
       font-weight: 600;
-      color: #1e293b;
+      color: var(--text-1);
       font-size: 15px;
     }
 
@@ -972,12 +977,12 @@ export class ShowcaseApp extends LitElement {
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.09em;
-      color: #94a3b8;
+      color: var(--text-3);
     }
 
     .drawer-divider {
       height: 1px;
-      background: #e5e7eb;
+      background: var(--border);
       margin: 4px 0;
     }
 
@@ -987,6 +992,99 @@ export class ShowcaseApp extends LitElement {
       justify-content: flex-end;
       padding-top: 8px;
       margin-top: 8px;
+    }
+
+    /* ── Hamburger ── */
+    .hamburger {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-2);
+      margin-right: -4px;
+      flex-shrink: 0;
+    }
+
+    .hamburger:hover {
+      background: var(--surface-2);
+      color: var(--text-1);
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 150;
+      background: rgba(0, 0, 0, 0.4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .hamburger { display: flex; }
+      .nav-tag { display: none; }
+      .nav-stat { display: none; }
+
+      .sidebar {
+        position: fixed;
+        top: 52px;
+        left: 0;
+        z-index: 160;
+        height: calc(100vh - 52px);
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.visible {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .content {
+        padding: 24px 16px 40px;
+      }
+
+      .content-title {
+        font-size: 22px;
+      }
+
+      .demo-tile-body {
+        padding: 16px 14px;
+      }
+
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .demo-stack {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .content {
+        padding: 16px 12px 36px;
+      }
+
+      .content-title {
+        font-size: 20px;
+      }
+
+      .demo-tile-body {
+        padding: 12px;
+      }
     }
 
     /* ── Misc ── */

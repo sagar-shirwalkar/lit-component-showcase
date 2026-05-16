@@ -67,6 +67,7 @@ export class ShowcaseInput extends LitElement {
     .outlined input {
       background: transparent;
       border-width: 2px;
+      border-color: #6366f1;
     }
   `
 
