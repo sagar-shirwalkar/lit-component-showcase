@@ -73,7 +73,9 @@ export class ShowcaseBarChart extends LitElement {
     const pad = { top: 20, right: 20, bottom: 40, left: 50 }
     const w = this.width - pad.left - pad.right
     const h = this.height - pad.top - pad.bottom
-    const allVals = this.data.flatMap(d => this.series.map(s => Number(d[s.key]) || 0))
+    const allVals = this.stacked
+      ? this.data.map(d => this.series.reduce((sum, s) => sum + (Number(d[s.key]) || 0), 0))
+      : this.data.flatMap(d => this.series.map(s => Number(d[s.key]) || 0))
     const yMax = Math.max(...allVals) * 1.2 || 1
     const yTicks = 5
     const toY = (v: number) => pad.top + h - (v / yMax) * h
@@ -102,9 +104,9 @@ export class ShowcaseBarChart extends LitElement {
         let acc = 0
         return this.series.map((s) => {
           const val = Number(d[s.key]) || 0
-          const y = toY(acc + val)
-          const bh = pad.top + h - y
-          const bar = { x, y, w: bw, h: bh, key: s.key, val, name: s.name, color: s.color, di }
+          const yBottom = toY(acc)
+          const yTop = toY(acc + val)
+          const bar = { x, y: yTop, w: bw, h: yBottom - yTop, key: s.key, val, name: s.name, color: s.color, di }
           acc += val
           return bar
         })

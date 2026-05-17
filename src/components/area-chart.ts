@@ -72,7 +72,9 @@ export class ShowcaseAreaChart extends LitElement {
     const pad = { top: 20, right: 20, bottom: 40, left: 50 }
     const w = this.width - pad.left - pad.right
     const h = this.height - pad.top - pad.bottom
-    const allVals = this.data.flatMap(d => this.series.map(s => Number(d[s.key]) || 0))
+    const allVals = this.stacked
+      ? this.data.map(d => this.series.reduce((sum, s) => sum + (Number(d[s.key]) || 0), 0))
+      : this.data.flatMap(d => this.series.map(s => Number(d[s.key]) || 0))
     const yMax = Math.max(...allVals) * 1.1 || 1
     const yTicks = 5
     const xStep = w / (this.data.length - 1 || 1)
