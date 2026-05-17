@@ -1,6 +1,6 @@
 # Lit UI Kit — Component Showcase
 
-A professional, interactive component library built with **Lit 3**, **TypeScript**, and **Vite**. The showcase features a Metro-inspired dashboard UI with a persistent sidebar, dark/light mode, and live demos of 22 fully self-contained web components.
+A professional, interactive component library built with **Lit 3**, **TypeScript**, and **Vite**. The showcase features a Metro-inspired dashboard UI with a persistent sidebar, dark/light mode, and live demos of 26 fully self-contained web components, including a built-in SVG chart suite.
 
 [View the kit here](https://lit-component-showcase.pages.dev)
 
@@ -48,13 +48,14 @@ Key features of the dashboard shell:
 
 | Category | Components |
 |---|---|
-| Category | Components |
-|---|---|---|
 | Form Controls | Button, Input, Checkbox, Toggle, Slider, Upload |
-| Display | Card, Badge, Alert, Notification |
+| Display | Card, Badge, Status, Notification |
 | Navigation | Tabs, Navbar, Accordion, Pagination, Dropdown, Sidebar |
 | Overlay | Modal, Drawer |
 | Data | Data Table, Calendar, Transfer, Timeline |
+| Charts | Line Chart, Area Chart, Bar Chart, Pie Chart |
+
+All chart components are pure inline SVG — no charting libraries (D3, Chart.js, etc.) are used. Each chart computes its own paths, axes, gradients, and hit-detection regions, and supports hover tooltips and a colour-coded legend. The line, area, and bar charts share a 600×300 viewBox and scale responsively via `width: 100%; height: auto`; the pie chart uses a square viewBox and supports both filled and donut variants.
 
 ---
 
@@ -172,7 +173,9 @@ lit-component-showcase/
 │   ├── components/          # Individual Lit web components
 │   │   ├── accordion.ts
 │   │   ├── alert.ts
+│   │   ├── area-chart.ts
 │   │   ├── badge.ts
+│   │   ├── bar-chart.ts
 │   │   ├── button.ts
 │   │   ├── calendar.ts
 │   │   ├── card.ts
@@ -181,10 +184,12 @@ lit-component-showcase/
 │   │   ├── drawer.ts
 │   │   ├── dropdown.ts
 │   │   ├── input.ts
+│   │   ├── line-chart.ts
 │   │   ├── modal.ts
 │   │   ├── navbar.ts
 │   │   ├── notification.ts
 │   │   ├── pagination.ts
+│   │   ├── pie-chart.ts
 │   │   ├── sidebar.ts
 │   │   ├── slider.ts
 │   │   ├── tabs.ts

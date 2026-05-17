@@ -23,6 +23,10 @@ import './components/upload.ts'
 import './components/transfer.ts'
 import './components/timeline.ts'
 import './components/notification.ts'
+import './components/line-chart.ts'
+import './components/area-chart.ts'
+import './components/bar-chart.ts'
+import './components/pie-chart.ts'
 
 @customElement('showcase-app')
 export class ShowcaseApp extends LitElement {
@@ -148,6 +152,15 @@ export class ShowcaseApp extends LitElement {
         { id: 'calendar', label: 'Calendar', desc: 'Date picker with month and year dropdown navigation' },
         { id: 'transfer', label: 'Transfer', desc: 'Dual-column list for moving items between source and target' },
         { id: 'timeline', label: 'Timeline', desc: 'Vertical timeline with completion states and date tracking' },
+      ],
+    },
+    {
+      category: 'Charts',
+      items: [
+        { id: 'line-chart', label: 'Line Chart', desc: 'Multi-series line chart with hover tooltips and legend' },
+        { id: 'area-chart', label: 'Area Chart', desc: 'Single and stacked area charts with gradient fills' },
+        { id: 'bar-chart', label: 'Bar Chart', desc: 'Grouped and stacked bar charts with hover values' },
+        { id: 'pie-chart', label: 'Pie Chart', desc: 'Filled and donut pie charts with percentage legend' },
       ],
     },
   ]
@@ -1033,6 +1046,92 @@ export class ShowcaseApp extends LitElement {
     `
   }
 
+  private renderLineChartDemo() {
+    const lineData = [
+      { name: 'Jan', revenue: 4200, users: 2800, orders: 1800 },
+      { name: 'Feb', revenue: 3800, users: 3200, orders: 2100 },
+      { name: 'Mar', revenue: 5100, users: 3600, orders: 2400 },
+      { name: 'Apr', revenue: 4700, users: 4100, orders: 2200 },
+      { name: 'May', revenue: 6200, users: 4800, orders: 2900 },
+      { name: 'Jun', revenue: 5800, users: 5200, orders: 3100 },
+    ]
+    const lineSeries = [
+      { key: 'revenue', name: 'Revenue', color: '#6366f1' },
+      { key: 'users', name: 'Users', color: '#22c55e' },
+      { key: 'orders', name: 'Orders', color: '#f59e0b' },
+    ]
+    return html`
+      ${this.tile('Multi-Series Line Chart', html`
+        <showcase-line-chart .data=${lineData} .series=${lineSeries}></showcase-line-chart>
+      `)}
+    `
+  }
+
+  private renderAreaChartDemo() {
+    const areaData = [
+      { name: 'Q1', visits: 1200, pageviews: 3400, sessions: 900 },
+      { name: 'Q2', visits: 1900, pageviews: 4200, sessions: 1400 },
+      { name: 'Q3', visits: 2800, pageviews: 5600, sessions: 2100 },
+      { name: 'Q4', visits: 3500, pageviews: 7100, sessions: 2800 },
+    ]
+    const areaSeries = [
+      { key: 'visits', name: 'Visits', color: '#6366f1' },
+      { key: 'pageviews', name: 'Page Views', color: '#22c55e' },
+      { key: 'sessions', name: 'Sessions', color: '#f59e0b' },
+    ]
+    return html`
+      ${this.tile('Single Area', html`
+        <showcase-area-chart .data=${areaData} .series=${[areaSeries[0]]}></showcase-area-chart>
+      `)}
+      ${this.tile('Stacked Area', html`
+        <showcase-area-chart .data=${areaData} .series=${areaSeries} .stacked=${true}></showcase-area-chart>
+      `)}
+    `
+  }
+
+  private renderBarChartDemo() {
+    const barData = [
+      { name: 'Mon', product: 45, service: 30, license: 20 },
+      { name: 'Tue', product: 52, service: 28, license: 25 },
+      { name: 'Wed', product: 38, service: 42, license: 18 },
+      { name: 'Thu', product: 55, service: 35, license: 30 },
+      { name: 'Fri', product: 48, service: 40, license: 22 },
+      { name: 'Sat', product: 25, service: 18, license: 10 },
+      { name: 'Sun', product: 15, service: 12, license: 8 },
+    ]
+    const barSeries = [
+      { key: 'product', name: 'Product', color: '#6366f1' },
+      { key: 'service', name: 'Service', color: '#22c55e' },
+      { key: 'license', name: 'License', color: '#f59e0b' },
+    ]
+    return html`
+      ${this.tile('Grouped Bar Chart', html`
+        <showcase-bar-chart .data=${barData} .series=${barSeries}></showcase-bar-chart>
+      `)}
+      ${this.tile('Stacked Bar Chart', html`
+        <showcase-bar-chart .data=${barData} .series=${barSeries} .stacked=${true}></showcase-bar-chart>
+      `)}
+    `
+  }
+
+  private renderPieChartDemo() {
+    const pieData = [
+      { name: 'Direct', value: 35, color: '#6366f1' },
+      { name: 'Organic', value: 28, color: '#22c55e' },
+      { name: 'Referral', value: 20, color: '#f59e0b' },
+      { name: 'Social', value: 12, color: '#ef4444' },
+      { name: 'Other', value: 5, color: '#8b5cf6' },
+    ]
+    return html`
+      ${this.tile('Filled Pie', html`
+        <showcase-pie-chart .data=${pieData}></showcase-pie-chart>
+      `)}
+      ${this.tile('Donut Chart', html`
+        <showcase-pie-chart .data=${pieData} .hollow=${true}></showcase-pie-chart>
+      `)}
+    `
+  }
+
   private renderNotificationDemo() {
     return html`
       ${this.tile('Trigger Notification', html`
@@ -1071,6 +1170,10 @@ export class ShowcaseApp extends LitElement {
       case 'upload': return this.renderUploadDemo()
       case 'transfer': return this.renderTransferDemo()
       case 'timeline': return this.renderTimelineDemo()
+      case 'line-chart': return this.renderLineChartDemo()
+      case 'area-chart': return this.renderAreaChartDemo()
+      case 'bar-chart': return this.renderBarChartDemo()
+      case 'pie-chart': return this.renderPieChartDemo()
       default: return this.renderButtonDemo()
     }
   }
@@ -1339,6 +1442,18 @@ export class ShowcaseApp extends LitElement {
       --notif-bg: #ffffff;
       --notif-border: #e5e7eb;
       --notif-shadow: 0 6px 24px rgba(0,0,0,0.12);
+      --chart-grid: #e5e7eb;
+      --chart-axis: #9ca3af;
+      --chart-crosshair: #d1d5db;
+      --chart-tooltip-bg: #1f2937;
+      --chart-tooltip-text: #ffffff;
+      --chart-tooltip-label: #e5e7eb;
+      --chart-legend-text: #6b7280;
+      --chart-legend-val: #374151;
+      --chart-pie-stroke: #ffffff;
+      --chart-pie-hole: transparent;
+      --chart-pie-center-label: #6b7280;
+      --chart-pie-center-val: #374151;
       --notif-accent-bg: #eef2ff;
       --notif-accent: #6366f1;
       --notif-title: #1f2937;
@@ -1558,6 +1673,18 @@ export class ShowcaseApp extends LitElement {
       --notif-bg: #1c1c1c;
       --notif-border: #27272a;
       --notif-shadow: 0 6px 24px rgba(0,0,0,0.4);
+      --chart-grid: #27272a;
+      --chart-axis: #52525b;
+      --chart-crosshair: #3f3f46;
+      --chart-tooltip-bg: #27272a;
+      --chart-tooltip-text: #e4e4e7;
+      --chart-tooltip-label: #fafafa;
+      --chart-legend-text: #71717a;
+      --chart-legend-val: #d4d4d8;
+      --chart-pie-stroke: #141414;
+      --chart-pie-hole: transparent;
+      --chart-pie-center-label: #71717a;
+      --chart-pie-center-val: #d4d4d8;
       --notif-accent-bg: #1e1b4b;
       --notif-accent: #818cf8;
       --notif-title: #e4e4e7;
@@ -1673,6 +1800,7 @@ export class ShowcaseApp extends LitElement {
     .body {
       display: flex;
       flex: 1;
+      min-height: 0;
     }
 
     /* ── Sidebar ── */
@@ -1682,9 +1810,6 @@ export class ShowcaseApp extends LitElement {
       background: var(--sidebar-bg);
       border-right: 1px solid var(--border);
       padding: 16px 0 40px;
-      height: calc(100vh - 52px);
-      position: sticky;
-      top: 52px;
       overflow-y: auto;
     }
 
@@ -2069,6 +2194,7 @@ export class ShowcaseApp extends LitElement {
         left: 0;
         z-index: 160;
         height: calc(100vh - 52px);
+        width: 260px;
         transform: translateX(-100%);
         transition: transform 0.25s ease;
       }
